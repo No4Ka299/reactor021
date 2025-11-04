@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>REACTOR — Демо</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0d0d1a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* 🔴 ДЕМО-БАННЕР */
+    .demo-banner {
+      background: #ff3b30;
+      color: white;
+      padding: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 🔝 Верхняя панель: профиль и настройки */
+    #top-ui {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(30, 30, 46, 0.7);
+      border: 1px solid #4deeea;
+      color: white;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+
+    .icon-btn:hover {
+      background: rgba(77, 238, 234, 0.2);
+      transform: scale(1.1);
+      border-color: #4deeea;
+    }
+
+    .icon-btn:focus {
+      outline: none;
+    }
+
+    /* Экраны */
+    .screen {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .active { display: flex !important; }
+
+    h1 {
+      font-size: 32px;
+      color: #4deeea;
+      margin-bottom: 20px;
+      z-index: 5;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 30px;
+      max-width: 500px;
+      line-height: 1.5;
+    }
+
+    /* Кубик — теперь 2D */
+    .dice {
+      width: 80px;
+      height: 80px;
+      background: #1e1e2e;
+      border: 3px solid #555;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      font-weight: bold;
+      margin: 30px 0;
+      z-index: 5;
+      position: relative;
+    }
+
+    /* Анимация подбрасывания */
+    .dice.animate {
+      animation: toss 2.2s cubic-bezier(0.3, 0.8, 0.5, 1) forwards;
+    }
+
+    @keyframes toss {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      30% {
+        transform: translateY(-120px) rotate(180deg);
+      }
+      60% {
+        transform: translateY(-60px) rotate(360deg);
+      }
+      80% {
+        transform: translateY(-20px) rotate(540deg);
+      }
+      100% {
+        transform: translateY(0) rotate(720deg);
+        opacity: 1;
+      }
+    }
+
+    .player1-start { color: #4deeea; }
+    .player2-start { color: #ff6b6b; }
+
+    button {
+      padding: 10px 24px;
+      background: #4deeea;
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      z-index: 5;
+      position: relative;
+    }
+
+    /* Игровой экран */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(5, 64px);
+      grid-gap: 4px;
+      margin: 16px auto;
+      max-width: 340px;
+    }
+    .cell {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+      background: #1a1a2a;
+    }
+    .cell:hover { transform: scale(1.04); }
+    .player1 { background: #1e3a8a; color: #bfdbfe; }
+    .player2 { background: #991b1b; color: #fecaca; }
+    .reactor::after { content: "●"; font-size: 22px; }
+
+    #status {
+      margin: 14px 0;
+      font-size: 18px;
+      min-height: 24px;
+      font-weight: bold;
+    }
+
+    #score {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 8px 0;
+      font-size: 15px;
+    }
+    .score-box {
+      padding: 6px 16px;
+      border-radius: 10px;
+    }
+    .you { border: 2px solid #4deeea; }
+    .bot { border: 2px solid #ff6b6b; }
+
+    #footer {
+      margin: 20px auto;
+      font-size: 12px;
+      color: #666;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🔴 ДЕМО-БАННЕР -->
+  <div class="demo-banner">
+    ДЕМО-ВЕРСИЯ • Онлайн-режим скоро!
+  </div>
+
+  <!-- 🔧 Верхняя панель: профиль и настройки -->
+  <div id="top-ui">
+    <button id="profile-btn" class="icon-btn" title="Профиль">👤</button>
+    <button id="settings-btn" class="icon-btn" title="Настройки">⚙️</button>
+  </div>
+
+  <!-- 🏠 ГЛАВНОЕ МЕНЮ -->
+  <div id="main-menu" class="screen active">
+    <h1>REACTOR</h1>
+    <p class="subtitle">
+      Добро пожаловать в стратегическую игру, где каждый ход решает исход битвы за контроль!<br>
+      Постройте реакторы, захватывайте клетки и обыграйте бота за 10 ходов.
+    </p>
+    <button onclick="goToStartScreen()">Начать игру</button>
+    <!-- Скоро: "Продолжить", "Настройки", "Профиль" -->
+  </div>
+
+  <!-- 🎬 СТАРТ-ЭКРАН (кто ходит первым) -->
+  <div id="start-screen" class="screen">
+    <h1>REACTOR</h1>
+    <p>Кто начнёт первым?</p>
+    <div class="dice" id="dice">?</div>
+    <button onclick="startToss()">Подбросить кубик</button>
+  </div>
+
+  <!-- 🎮 ИГРОВОЙ ЭКРАН -->
+  <div id="game-screen" class="screen">
+    <h1>REACTOR</h1>
+    <div id="score">
+      <div class="score-box you">Ты: <span id="you-score">0</span></div>
+      <div class="score-box bot">Бот: <span id="bot-score">0</span></div>
+    </div>
+    <div id="status">Ожидание начала...</div>
+    <div id="board"></div>
+    <div id="controls">
+      <button onclick="resetToStart()">Новая игра</button>
+    </div>
+    <div id="footer">
+      Каждый реактор (●) перекрашивает соседние клетки.<br>
+      После 10 ходов побеждает контролирующий больше.
+    </div>
+  </div>
+
+  <script>
+    const SIZE = 5;
+    const TOTAL_MOVES = 10;
+    let board, reactors, moveCount, gameActive, currentPlayer;
+
+    function goToStartScreen() {
+      document.getElementById('main-menu').classList.remove('active');
+      document.getElementById('start-screen').classList.add('active');
+    }
+
+    function startToss() {
+      const dice = document.getElementById('dice');
+      dice.textContent = '?';
+      dice.className = 'dice animate';
+
+      setTimeout(() => {
+        const firstPlayer = Math.random() > 0.5 ? 'human' : 'bot';
+        dice.textContent = firstPlayer === 'human' ? '👤' : '🤖';
+        dice.style.color = firstPlayer === 'human' ? '#4deeea' : '#ff6b6b';
+        dice.classList.remove('animate');
+
+        setTimeout(() => {
+          document.getElementById('start-screen').classList.remove('active');
+          document.getElementById('game-screen').classList.add('active');
+          initGame(firstPlayer);
+        }, 600);
+      }, 2200);
+    }
+
+    function initGame(firstPlayer) {
+      board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
+      reactors = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
+      moveCount = 0;
+      gameActive = true;
+      currentPlayer = firstPlayer;
+
+      const statusEl = document.getElementById('status');
+      if (currentPlayer === 'human') {
+        statusEl.textContent = 'Твой ход — поставь реактор';
+      } else {
+        statusEl.textContent = 'Бот ходит первым...';
+        render();
+        setTimeout(botMove, 800);
+      }
+      render();
+    }
+
+    function render() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      let youScore = 0, botScore = 0;
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          if (board[r][c] === 1) {
+            cell.classList.add('player1');
+            youScore++;
+          } else if (board[r][c] === 2) {
+            cell.classList.add('player2');
+            botScore++;
+          }
+          if (reactors[r][c]) cell.classList.add('reactor');
+
+          if (gameActive && board[r][c] === 0 && moveCount < TOTAL_MOVES && currentPlayer === 'human') {
+            cell.onclick = () => playerMove(r, c);
+          }
+          boardEl.appendChild(cell);
+        }
+      }
+
+      document.getElementById('you-score').textContent = youScore;
+      document.getElementById('bot-score').textContent = botScore;
+
+      if (moveCount >= TOTAL_MOVES && gameActive) {
+        gameActive = false;
+        const statusEl = document.getElementById('status');
+        if (youScore > botScore) statusEl.textContent = '🏆 Победа!';
+        else if (botScore > youScore) statusEl.textContent = '💔 Поражение.';
+        else statusEl.textContent = '🤝 Ничья!';
+      }
+    }
+
+    function activateReactor(row, col, player) {
+      reactors[row][col] = true;
+      board[row][col] = player;
+      const dirs = [[-1,0], [1,0], [0,-1], [0,1]];
+      for (const [dr, dc] of dirs) {
+        const nr = row + dr, nc = col + dc;
+        if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+          board[nr][nc] = player;
+        }
+      }
+    }
+
+    function playerMove(r, c) {
+      if (!gameActive || currentPlayer !== 'human' || board[r][c] !== 0) return;
+      activateReactor(r, c, 1);
+      moveCount++;
+      currentPlayer = 'bot';
+      if (moveCount < TOTAL_MOVES) {
+        document.getElementById('status').textContent = 'Ход бота...';
+        render();
+        setTimeout(botMove, 600);
+      } else {
+        render();
+      }
+    }
+
+    function botMove() {
+      if (!gameActive || currentPlayer !== 'bot') return;
+
+      let bestMove = null;
+      let bestValue = -1;
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (board[r][c] === 0) {
+            let value = 0;
+            const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+            for (const [dr, dc] of dirs) {
+              const nr = r + dr, nc = c + dc;
+              if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+                if (board[nr][nc] === 1) value += 3;
+                else value += 1;
+              }
+            }
+            if (value > bestValue) {
+              bestValue = value;
+              bestMove = [r, c];
+            }
+          }
+        }
+      }
+
+      if (bestMove) {
+        activateReactor(bestMove[0], bestMove[1], 2);
+        moveCount++;
+        currentPlayer = 'human';
+        if (moveCount < TOTAL_MOVES) {
+          document.getElementById('status').textContent = 'Твой ход — поставь реактор';
+        }
+        render();
+      }
+    }
+
+    function resetToStart() {
+      document.getElementById('game-screen').classList.remove('active');
+      document.getElementById('start-screen').classList.add('active');
+    }
+
+    // Заглушки для кнопок (можно позже расширить)
+    document.getElementById('profile-btn').onclick = () => {
+      alert('Профиль (скоро!)');
+    };
+    document.getElementById('settings-btn').onclick = () => {
+      alert('Настройки (скоро!)');
+    };
+  </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
