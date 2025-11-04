@@ -26,7 +26,6 @@
       overflow: hidden;
     }
 
-    /* 🔴 ДЕМО-БАННЕР */
     .demo-banner {
       background: #ff3b30;
       color: white;
@@ -36,13 +35,13 @@
       letter-spacing: 0.5px;
       text-shadow: 0 1px 2px rgba(0,0,0,0.3);
       position: relative;
-      z-index: 10;
+      z-index: 30;
+      text-align: center;
     }
 
-    /* 🔝 Верхняя панель: профиль и настройки */
     #top-ui {
       position: absolute;
-      top: 12px;
+      top: 42px;
       right: 12px;
       display: flex;
       gap: 12px;
@@ -76,7 +75,6 @@
       outline: none;
     }
 
-    /* Экраны */
     .screen {
       display: none;
       width: 100vw;
@@ -107,7 +105,6 @@
       line-height: 1.5;
     }
 
-    /* Кубик — теперь 2D */
     .dice {
       width: 80px;
       height: 80px;
@@ -124,33 +121,17 @@
       position: relative;
     }
 
-    /* Анимация подбрасывания */
     .dice.animate {
       animation: toss 2.2s cubic-bezier(0.3, 0.8, 0.5, 1) forwards;
     }
 
     @keyframes toss {
-      0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-      }
-      30% {
-        transform: translateY(-120px) rotate(180deg);
-      }
-      60% {
-        transform: translateY(-60px) rotate(360deg);
-      }
-      80% {
-        transform: translateY(-20px) rotate(540deg);
-      }
-      100% {
-        transform: translateY(0) rotate(720deg);
-        opacity: 1;
-      }
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      30% { transform: translateY(-120px) rotate(180deg); }
+      60% { transform: translateY(-60px) rotate(360deg); }
+      80% { transform: translateY(-20px) rotate(540deg); }
+      100% { transform: translateY(0) rotate(720deg); opacity: 1; }
     }
-
-    .player1-start { color: #4deeea; }
-    .player2-start { color: #ff6b6b; }
 
     button {
       padding: 10px 24px;
@@ -166,7 +147,6 @@
       position: relative;
     }
 
-    /* Игровой экран */
     #board {
       display: grid;
       grid-template-columns: repeat(5, 64px);
@@ -219,21 +199,161 @@
       max-width: 400px;
       line-height: 1.5;
     }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: #141424;
+      border: 2px solid #4deeea;
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(77, 238, 234, 0.3);
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal h2 {
+      color: #4deeea;
+      margin-top: 0;
+      font-size: 22px;
+    }
+
+    .modal p {
+      color: #ccc;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    /* 📖 Changelog Accordion */
+    .patch-entry {
+      margin: 16px 0;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(30, 30, 46, 0.3);
+    }
+
+    .patch-header {
+      padding: 12px 16px;
+      background: rgba(77, 238, 234, 0.1);
+      color: #4deeea;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .patch-header:hover {
+      background: rgba(77, 238, 234, 0.2);
+    }
+
+    .patch-arrow {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
+      fill: #4deeea;
+    }
+
+    .patch-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+      background: rgba(20, 20, 36, 0.6);
+      color: #ccc;
+      padding: 0 16px;
+    }
+
+    .patch-content.open {
+      max-height: 300px;
+      padding: 16px;
+    }
+
+    .patch-content ul {
+      text-align: left;
+      padding-left: 20px;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .patch-content li {
+      margin-bottom: 6px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .close-modal:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .close-modal svg {
+      width: 16px;
+      height: 16px;
+      fill: #aaa;
+      transition: fill 0.2s;
+    }
+
+    .close-modal:hover svg {
+      fill: white;
+    }
   </style>
 </head>
 <body>
-  <!-- 🔴 ДЕМО-БАННЕР -->
   <div class="demo-banner">
-    ДЕМО-ВЕРСИЯ • Онлайн-режим скоро!
+    ДЕМО-ВЕРСИЯ
   </div>
 
-  <!-- 🔧 Верхняя панель: профиль и настройки -->
   <div id="top-ui">
-    <button id="profile-btn" class="icon-btn" title="Профиль">👤</button>
-    <button id="settings-btn" class="icon-btn" title="Настройки">⚙️</button>
+    <button id="profile-btn" class="icon-btn" title="Profile">👤</button>
+    <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+    <button id="changelog-btn" class="icon-btn" title="Changelog">📖</button>
   </div>
 
-  <!-- 🏠 ГЛАВНОЕ МЕНЮ -->
   <div id="main-menu" class="screen active">
     <h1>REACTOR</h1>
     <p class="subtitle">
@@ -241,10 +361,8 @@
       Постройте реакторы, захватывайте клетки и обыграйте бота за 10 ходов.
     </p>
     <button onclick="goToStartScreen()">Начать игру</button>
-    <!-- Скоро: "Продолжить", "Настройки", "Профиль" -->
   </div>
 
-  <!-- 🎬 СТАРТ-ЭКРАН (кто ходит первым) -->
   <div id="start-screen" class="screen">
     <h1>REACTOR</h1>
     <p>Кто начнёт первым?</p>
@@ -252,7 +370,6 @@
     <button onclick="startToss()">Подбросить кубик</button>
   </div>
 
-  <!-- 🎮 ИГРОВОЙ ЭКРАН -->
   <div id="game-screen" class="screen">
     <h1>REACTOR</h1>
     <div id="score">
@@ -267,6 +384,61 @@
     <div id="footer">
       Каждый реактор (●) перекрашивает соседние клетки.<br>
       После 10 ходов побеждает контролирующий больше.
+    </div>
+  </div>
+
+  <!-- 👤 Профиль -->
+  <div id="profile-modal" class="modal-overlay">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('profile-modal')">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+      <h2>Profile</h2>
+      <p>Soon</p>
+    </div>
+  </div>
+
+  <!-- ⚙️ Настройки -->
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('settings-modal')">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+      <h2>Settings</h2>
+      <p>Soon</p>
+    </div>
+  </div>
+
+  <!-- 📖 Changelog -->
+  <div id="changelog-modal" class="modal-overlay">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('changelog-modal')">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+      <h2>Changelog</h2>
+
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-01')">
+          v0.1 (Ноябрь 2025)
+          <svg class="patch-arrow" id="arrow-01" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-01">
+          <ul>
+            <li>Добавлено главное меню и экран определения первого хода</li>
+            <li>Реализована игровая механика: реакторы, захват клеток, 10 ходов</li>
+            <li>Добавлен ИИ-бот с базовой стратегией</li>
+            <li>Введены разделы: Профиль, Настройки, История обновлений</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -421,13 +593,40 @@
       document.getElementById('start-screen').classList.add('active');
     }
 
-    // Заглушки для кнопок (можно позже расширить)
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function togglePatch(patchId) {
+      const content = document.getElementById(patchId);
+      const arrowId = `arrow-${patchId.split('-')[1]}`;
+      const arrow = document.getElementById(arrowId);
+      
+      content.classList.toggle('open');
+      if (content.classList.contains('open')) {
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
     document.getElementById('profile-btn').onclick = () => {
-      alert('Профиль (скоро!)');
+      document.getElementById('profile-modal').classList.add('active');
     };
     document.getElementById('settings-btn').onclick = () => {
-      alert('Настройки (скоро!)');
+      document.getElementById('settings-modal').classList.add('active');
     };
+    document.getElementById('changelog-btn').onclick = () => {
+      document.getElementById('changelog-modal').classList.add('active');
+    };
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+        }
+      });
+    });
   </script>
 </body>
 </html>
