@@ -1,15 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>Untitled</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -252,9 +241,9 @@
       line-height: 1.5;
     }
 
-    /* 📖 Changelog Accordion */
+    /* Changelog Accordions */
     .patch-entry {
-      margin: 16px 0;
+      margin: 14px 0;
       border: 1px solid #333;
       border-radius: 10px;
       overflow: hidden;
@@ -295,7 +284,7 @@
     }
 
     .patch-content.open {
-      max-height: 300px;
+      max-height: 400px;
       padding: 16px;
     }
 
@@ -308,6 +297,59 @@
 
     .patch-content li {
       margin-bottom: 6px;
+    }
+
+    /* Info Accordions */
+    .info-section {
+      margin: 14px 0;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(30, 30, 46, 0.3);
+    }
+
+    .info-header {
+      padding: 12px 16px;
+      background: rgba(77, 238, 234, 0.1);
+      color: #4deeea;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .info-header:hover {
+      background: rgba(77, 238, 234, 0.2);
+    }
+
+    .info-arrow {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
+      fill: #4deeea;
+    }
+
+    .info-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+      background: rgba(20, 20, 36, 0.6);
+      color: #ccc;
+      padding: 0 16px;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .info-content.open {
+      max-height: 400px;
+      padding: 16px;
+    }
+
+    .info-content p {
+      margin: 8px 0;
     }
 
     .close-modal {
@@ -352,6 +394,7 @@
     <button id="profile-btn" class="icon-btn" title="Profile">👤</button>
     <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
     <button id="changelog-btn" class="icon-btn" title="Changelog">📖</button>
+    <button id="info-btn" class="icon-btn" title="Info">❓</button>
   </div>
 
   <div id="main-menu" class="screen active">
@@ -413,30 +456,115 @@
     </div>
   </div>
 
-  <!-- 📖 Changelog -->
-  <div id="changelog-modal" class="modal-overlay">
+ <!-- 📖 Changelog -->
+<div id="changelog-modal" class="modal-overlay">
+  <div class="modal">
+    <button class="close-modal" onclick="closeModal('changelog-modal')">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
+    <h2>Changelog</h2>
+
+    <!-- v0.2 — новый -->
+    <div class="patch-entry">
+      <div class="patch-header" onclick="togglePatch('patch-02')">
+        v0.2
+        <svg class="patch-arrow" id="arrow-02" viewBox="0 0 24 24">
+          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </svg>
+      </div>
+      <div class="patch-content" id="patch-02">
+        <ul>
+          <li><strong>Добавлено:</strong></li>
+          <li>• Новый ИИ-бот: выбирает из топ-3 ходов + случайность</li>
+          <li>• Кнопки: Профиль, Настройки, Changelog, Info</li>
+          <li>• Модальные окна вместо alert()</li>
+          <li>• Пользовательское соглашение и авторство</li>
+          <li><strong>Улучшено:</strong></li>
+          <li>• Дизайн, читаемость, производительность</li>
+          <li><strong>Исправлено:</strong></li>
+          <li>• Бот всегда делал один и тот же ход</li>
+          <li>• Иконки залазили на баннер</li>
+          <li>• Технические фразы в changelog</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- v0.1 — архив -->
+    <div class="patch-entry">
+      <div class="patch-header" onclick="togglePatch('patch-01')">
+        v0.1
+        <svg class="patch-arrow" id="arrow-01" viewBox="0 0 24 24">
+          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </svg>
+      </div>
+      <div class="patch-content" id="patch-01">
+        <ul>
+          <li>• Добавлено главное меню и экран определения первого хода</li>
+          <li>• Реализована игровая механика: реакторы, захват клеток, 10 ходов</li>
+          <li>• Добавлен ИИ-бот с базовой стратегией</li>
+          <li>• Введены разделы: Профиль, Настройки, История обновлений</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ❓ Info -->
+  <div id="info-modal" class="modal-overlay">
     <div class="modal">
-      <button class="close-modal" onclick="closeModal('changelog-modal')">
+      <button class="close-modal" onclick="closeModal('info-modal')">
         <svg viewBox="0 0 24 24">
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
         </svg>
       </button>
-      <h2>Changelog</h2>
+      <h2>Info</h2>
 
-      <div class="patch-entry">
-        <div class="patch-header" onclick="togglePatch('patch-01')">
-          v0.1 (Ноябрь 2025)
-          <svg class="patch-arrow" id="arrow-01" viewBox="0 0 24 24">
+      <div class="info-section">
+        <div class="info-header" onclick="toggleInfo('rules')">
+          Правила игры
+          <svg class="info-arrow" id="arrow-rules" viewBox="0 0 24 24">
             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
           </svg>
         </div>
-        <div class="patch-content" id="patch-01">
-          <ul>
-            <li>Добавлено главное меню и экран определения первого хода</li>
-            <li>Реализована игровая механика: реакторы, захват клеток, 10 ходов</li>
-            <li>Добавлен ИИ-бот с базовой стратегией</li>
-            <li>Введены разделы: Профиль, Настройки, История обновлений</li>
-          </ul>
+        <div class="info-content" id="rules">
+          <p>• Игровое поле: 5×5 клеток.</p>
+          <p>• Всего 10 ходов (по 5 на игрока).</p>
+          <p>• При установке реактора (●) вы захватываете:</p>
+          <p style="padding-left: 20px;">— клетку с реактором,</p>
+          <p style="padding-left: 20px;">— все 4 соседние клетки (вверх, вниз, влево, вправо).</p>
+          <p>• Побеждает игрок, контролирующий больше клеток после 10 ходов.</p>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-header" onclick="toggleInfo('agreement')">
+          Пользовательское соглашение
+          <svg class="info-arrow" id="arrow-agreement" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="info-content" id="agreement">
+          <p>• Данная демо-версия предоставляется «как есть».</p>
+          <p>• Автор не несёт ответственности за ущерб, убытки или любые последствия использования игры.</p>
+          <p>• Игра не собирает персональные данные. Нет подключения к интернету.</p>
+          <p>• Все права защищены. Запрещено копирование и распространение без согласия автора.</p>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-header" onclick="toggleInfo('about')">
+          О проекте
+          <svg class="info-arrow" id="arrow-about" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="info-content" id="about">
+          <p>Игра <strong>REACTOR</strong> создана и принадлежит <strong>G3laZi Project</strong>.</p>
+          <p>Версия: v0.2 (демо)</p>
+          <p>© 2025 G3laZi Project. Все права защищены.</p>
+          <p>Официальный репозиторий: <em>скоро на GitHub</em></p>
         </div>
       </div>
     </div>
@@ -555,37 +683,39 @@
     function botMove() {
       if (!gameActive || currentPlayer !== 'bot') return;
 
-      let bestMove = null;
-      let bestValue = -1;
+      let moves = [];
+      const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+
       for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
           if (board[r][c] === 0) {
             let value = 0;
-            const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
             for (const [dr, dc] of dirs) {
               const nr = r + dr, nc = c + dc;
               if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
                 if (board[nr][nc] === 1) value += 3;
-                else value += 1;
+                else if (board[nr][nc] === 0) value += 1;
               }
             }
-            if (value > bestValue) {
-              bestValue = value;
-              bestMove = [r, c];
-            }
+            value += Math.random(); // ✅ непредсказуемость
+            moves.push({ r, c, value });
           }
         }
       }
 
-      if (bestMove) {
-        activateReactor(bestMove[0], bestMove[1], 2);
-        moveCount++;
-        currentPlayer = 'human';
-        if (moveCount < TOTAL_MOVES) {
-          document.getElementById('status').textContent = 'Твой ход — поставь реактор';
-        }
-        render();
+      if (moves.length === 0) return;
+
+      moves.sort((a, b) => b.value - a.value);
+      const topMoves = moves.slice(0, Math.min(3, moves.length));
+      const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+
+      activateReactor(chosen.r, chosen.c, 2);
+      moveCount++;
+      currentPlayer = 'human';
+      if (moveCount < TOTAL_MOVES) {
+        document.getElementById('status').textContent = 'Твой ход — поставь реактор';
       }
+      render();
     }
 
     function resetToStart() {
@@ -601,7 +731,17 @@
       const content = document.getElementById(patchId);
       const arrowId = `arrow-${patchId.split('-')[1]}`;
       const arrow = document.getElementById(arrowId);
-      
+      content.classList.toggle('open');
+      if (content.classList.contains('open')) {
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function toggleInfo(sectionId) {
+      const content = document.getElementById(sectionId);
+      const arrow = document.getElementById(`arrow-${sectionId}`);
       content.classList.toggle('open');
       if (content.classList.contains('open')) {
         arrow.style.transform = 'rotate(180deg)';
@@ -619,6 +759,9 @@
     document.getElementById('changelog-btn').onclick = () => {
       document.getElementById('changelog-modal').classList.add('active');
     };
+    document.getElementById('info-btn').onclick = () => {
+      document.getElementById('info-modal').classList.add('active');
+    };
 
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
       overlay.addEventListener('click', (e) => {
@@ -629,8 +772,4 @@
     });
   </script>
 </body>
-</html>
-    
-  </body>
-  
 </html>
