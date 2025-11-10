@@ -456,60 +456,60 @@
     </div>
   </div>
 
- <!-- 📖 Changelog -->
-<div id="changelog-modal" class="modal-overlay">
-  <div class="modal">
-    <button class="close-modal" onclick="closeModal('changelog-modal')">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-      </svg>
-    </button>
-    <h2>Changelog</h2>
-
-    <!-- v0.2 — новый -->
-    <div class="patch-entry">
-      <div class="patch-header" onclick="togglePatch('patch-02')">
-        v0.2
-        <svg class="patch-arrow" id="arrow-02" viewBox="0 0 24 24">
-          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+  <!-- 📖 Changelog -->
+  <div id="changelog-modal" class="modal-overlay">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('changelog-modal')">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
         </svg>
-      </div>
-      <div class="patch-content" id="patch-02">
-        <ul>
-          <li><strong>Добавлено:</strong></li>
-          <li>• Новый ИИ-бот: выбирает из топ-3 ходов + случайность</li>
-          <li>• Кнопки: Профиль, Настройки, Changelog, Info</li>
-          <li>• Модальные окна вместо alert()</li>
-          <li>• Пользовательское соглашение и авторство</li>
-          <li><strong>Улучшено:</strong></li>
-          <li>• Дизайн, читаемость, производительность</li>
-          <li><strong>Исправлено:</strong></li>
-          <li>• Бот всегда делал один и тот же ход</li>
-          <li>• Иконки залазили на баннер</li>
-          <li>• Технические фразы в changelog</li>
-        </ul>
-      </div>
-    </div>
+      </button>
+      <h2>Changelog</h2>
 
-    <!-- v0.1 — архив -->
-    <div class="patch-entry">
-      <div class="patch-header" onclick="togglePatch('patch-01')">
-        v0.1
-        <svg class="patch-arrow" id="arrow-01" viewBox="0 0 24 24">
-          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-        </svg>
+      <!-- v0.2 — обновлён: добавлено про бота -->
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-02')">
+          v0.2
+          <svg class="patch-arrow" id="arrow-02" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-02">
+          <ul>
+            <li><strong>Добавлено:</strong></li>
+            <li>• Продвинутый ИИ-бот: анализ угроз, фазы игры, симуляция ответа</li>
+            <li>• Кнопки: Профиль, Настройки, Changelog, Info</li>
+            <li>• Модальные окна вместо alert()</li>
+            <li>• Пользовательское соглашение и авторство</li>
+            <li><strong>Улучшено:</strong></li>
+            <li>• Дизайн, читаемость, производительность</li>
+            <li><strong>Исправлено:</strong></li>
+            <li>• Бот всегда делал один и тот же ход</li>
+            <li>• Иконки залазили на баннер</li>
+            <li>• Технические фразы в changelog</li>
+          </ul>
+        </div>
       </div>
-      <div class="patch-content" id="patch-01">
-        <ul>
-          <li>• Добавлено главное меню и экран определения первого хода</li>
-          <li>• Реализована игровая механика: реакторы, захват клеток, 10 ходов</li>
-          <li>• Добавлен ИИ-бот с базовой стратегией</li>
-          <li>• Введены разделы: Профиль, Настройки, История обновлений</li>
-        </ul>
+
+      <!-- v0.1 — архив -->
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-01')">
+          v0.1
+          <svg class="patch-arrow" id="arrow-01" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-01">
+          <ul>
+            <li>• Добавлено главное меню и экран определения первого хода</li>
+            <li>• Реализована игровая механика: реакторы, захват клеток, 10 ходов</li>
+            <li>• Добавлен ИИ-бот с базовой стратегией</li>
+            <li>• Введены разделы: Профиль, Настройки, История обновлений</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- ❓ Info -->
   <div id="info-modal" class="modal-overlay">
@@ -680,33 +680,84 @@
       }
     }
 
+    // ✅ Новый продвинутый бот
     function botMove() {
       if (!gameActive || currentPlayer !== 'bot') return;
 
+      const phase = moveCount < 4 ? 'early' : moveCount < 7 ? 'mid' : 'late';
       let moves = [];
       const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
 
       for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
-          if (board[r][c] === 0) {
-            let value = 0;
-            for (const [dr, dc] of dirs) {
-              const nr = r + dr, nc = c + dc;
-              if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
-                if (board[nr][nc] === 1) value += 3;
-                else if (board[nr][nc] === 0) value += 1;
+          if (board[r][c] !== 0) continue;
+
+          let baseValue = 0;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+              if (board[nr][nc] === 1) baseValue += 10;
+              else if (board[nr][nc] === 0) baseValue += 4;
+              else if (board[nr][nc] === 2) baseValue += 1;
+            }
+          }
+          if (phase === 'early' && r >= 1 && r <= 3 && c >= 1 && c <= 3) {
+            baseValue += 5; // умеренный бонус за центр
+          }
+
+          let threatValue = 0;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc] === 1) {
+              let futureDamage = 0;
+              for (const [dr2, dc2] of dirs) {
+                const nnr = nr + dr2, nnc = nc + dc2;
+                if (nnr >= 0 && nnr < SIZE && nnc >= 0 && nnc < SIZE) {
+                  if (board[nnr][nnc] === 2) futureDamage++;
+                }
+              }
+              threatValue = Math.max(threatValue, futureDamage * 5);
+            }
+          }
+
+          let opponentResponseValue = 0;
+          const simBoard = board.map(row => [...row]);
+          simBoard[r][c] = 2;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+              simBoard[nr][nc] = 2;
+            }
+          }
+          let bestOpponentValue = 0;
+          for (let or = 0; or < SIZE; or++) {
+            for (let oc = 0; oc < SIZE; oc++) {
+              if (simBoard[or][oc] === 0) {
+                let val = 0;
+                for (const [dr, dc] of dirs) {
+                  const nnr = or + dr, nnc = oc + dc;
+                  if (nnr >= 0 && nnr < SIZE && nnc >= 0 && nnc < SIZE) {
+                    if (simBoard[nnr][nnc] === 2) val += 10;
+                    else if (simBoard[nnr][nnc] === 0) val += 4;
+                  }
+                }
+                bestOpponentValue = Math.max(bestOpponentValue, val);
               }
             }
-            value += Math.random(); // ✅ непредсказуемость
-            moves.push({ r, c, value });
           }
+          opponentResponseValue = -bestOpponentValue * 0.7;
+
+          let totalValue = baseValue + threatValue + opponentResponseValue;
+          totalValue += (Math.random() - 0.5) * 2; // небольшой хаос
+
+          moves.push({ r, c, value: totalValue });
         }
       }
 
       if (moves.length === 0) return;
 
       moves.sort((a, b) => b.value - a.value);
-      const topMoves = moves.slice(0, Math.min(3, moves.length));
+      const topMoves = moves.slice(0, 2);
       const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
 
       activateReactor(chosen.r, chosen.c, 2);
