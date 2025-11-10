@@ -138,27 +138,27 @@
 
     #board {
       display: grid;
-      grid-template-columns: repeat(5, 64px);
-      grid-gap: 4px;
+      grid-template-columns: repeat(7, 52px);
+      grid-gap: 3px;
       margin: 16px auto;
-      max-width: 340px;
+      max-width: 380px;
     }
     .cell {
-      width: 64px;
-      height: 64px;
-      border-radius: 8px;
+      width: 52px;
+      height: 52px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 22px;
       cursor: pointer;
       transition: transform 0.15s, background 0.2s;
       background: #1a1a2a;
     }
-    .cell:hover { transform: scale(1.04); }
+    .cell:hover { transform: scale(1.03); }
     .player1 { background: #1e3a8a; color: #bfdbfe; }
     .player2 { background: #991b1b; color: #fecaca; }
-    .reactor::after { content: "●"; font-size: 22px; }
+    .reactor::after { content: "●"; font-size: 18px; }
 
     #status {
       margin: 14px 0;
@@ -401,7 +401,7 @@
     <h1>REACTOR</h1>
     <p class="subtitle">
       Добро пожаловать в стратегическую игру, где каждый ход решает исход битвы за контроль!<br>
-      Постройте реакторы, захватывайте клетки и обыграйте бота за 10 ходов.
+      Постройте реакторы, захватывайте клетки и обыграйте бота за 14 ходов.
     </p>
     <button onclick="goToStartScreen()">Начать игру</button>
   </div>
@@ -426,7 +426,7 @@
     </div>
     <div id="footer">
       Каждый реактор (●) перекрашивает соседние клетки.<br>
-      После 10 ходов побеждает контролирующий больше.
+      После 14 ходов побеждает контролирующий больше.
     </div>
   </div>
 
@@ -466,7 +466,28 @@
       </button>
       <h2>Changelog</h2>
 
-      <!-- v0.2 — обновлён: добавлено про бота -->
+      <!-- v0.2.1 — новый -->
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-021')">
+          v0.2.1
+          <svg class="patch-arrow" id="arrow-021" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-021">
+          <ul>
+            <li><strong>Добавлено:</strong></li>
+            <li>• Поле увеличено до <strong>7×7</strong></li>
+            <li>• Всего ходов: <strong>14</strong> (по 7 на игрока)</li>
+            <li>• Перебалансирован ИИ под новое поле</li>
+            <li><strong>Исправлено:</strong></li>
+            <li>• Рандом первого хода больше не решает исход</li>
+            <li>• Тактика заменяет угадывание</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- v0.2 -->
       <div class="patch-entry">
         <div class="patch-header" onclick="togglePatch('patch-02')">
           v0.2
@@ -529,12 +550,12 @@
           </svg>
         </div>
         <div class="info-content" id="rules">
-          <p>• Игровое поле: 5×5 клеток.</p>
-          <p>• Всего 10 ходов (по 5 на игрока).</p>
+          <p>• Игровое поле: <strong>7×7 клеток</strong>.</p>
+          <p>• Всего <strong>14 ходов</strong> (по 7 на игрока).</p>
           <p>• При установке реактора (●) вы захватываете:</p>
           <p style="padding-left: 20px;">— клетку с реактором,</p>
           <p style="padding-left: 20px;">— все 4 соседние клетки (вверх, вниз, влево, вправо).</p>
-          <p>• Побеждает игрок, контролирующий больше клеток после 10 ходов.</p>
+          <p>• Побеждает игрок, контролирующий больше клеток после 14 ходов.</p>
         </div>
       </div>
 
@@ -562,7 +583,7 @@
         </div>
         <div class="info-content" id="about">
           <p>Игра <strong>REACTOR</strong> создана и принадлежит <strong>G3laZi Project</strong>.</p>
-          <p>Версия: v0.2 (демо)</p>
+          <p>Версия: v0.2.1 (демо)</p>
           <p>© 2025 G3laZi Project. Все права защищены.</p>
           <p>Официальный репозиторий: <em>скоро на GitHub</em></p>
         </div>
@@ -571,8 +592,8 @@
   </div>
 
   <script>
-    const SIZE = 5;
-    const TOTAL_MOVES = 10;
+    const SIZE = 7;          // ✅ 7×7
+    const TOTAL_MOVES = 14;  // ✅ 14 ходов
     let board, reactors, moveCount, gameActive, currentPlayer;
 
     function goToStartScreen() {
@@ -680,11 +701,11 @@
       }
     }
 
-    // ✅ Новый продвинутый бот
+    // ✅ Продвинутый бот под 7×7
     function botMove() {
       if (!gameActive || currentPlayer !== 'bot') return;
 
-      const phase = moveCount < 4 ? 'early' : moveCount < 7 ? 'mid' : 'late';
+      const phase = moveCount < 5 ? 'early' : moveCount < 10 ? 'mid' : 'late';
       let moves = [];
       const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
 
@@ -701,8 +722,9 @@
               else if (board[nr][nc] === 2) baseValue += 1;
             }
           }
-          if (phase === 'early' && r >= 1 && r <= 3 && c >= 1 && c <= 3) {
-            baseValue += 5; // умеренный бонус за центр
+          // Центр 3×3 = (2,2) to (4,4) → бонус
+          if (phase === 'early' && r >= 2 && r <= 4 && c >= 2 && c <= 4) {
+            baseValue += 4;
           }
 
           let threatValue = 0;
@@ -748,7 +770,7 @@
           opponentResponseValue = -bestOpponentValue * 0.7;
 
           let totalValue = baseValue + threatValue + opponentResponseValue;
-          totalValue += (Math.random() - 0.5) * 2; // небольшой хаос
+          totalValue += (Math.random() - 0.5) * 2;
 
           moves.push({ r, c, value: totalValue });
         }
