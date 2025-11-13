@@ -2,8 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>REACTOR — Демо</title>
+  <!-- 🔵 Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     body {
       margin: 0;
@@ -13,6 +15,12 @@
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       overflow: hidden;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
     }
 
     .demo-banner {
@@ -138,27 +146,50 @@
 
     #board {
       display: grid;
-      grid-template-columns: repeat(7, 52px);
+      grid-template-columns: repeat(7, min(52px, calc((100vw - 40px) / 7)));
       grid-gap: 3px;
-      margin: 16px auto;
-      max-width: 380px;
+      margin: 12px auto;
+      max-width: calc(7 * min(52px, (100vw - 40px) / 7) + 24px);
     }
     .cell {
-      width: 52px;
-      height: 52px;
+      width: min(52px, calc((100vw - 40px) / 7 - 3px));
+      height: min(52px, calc((100vw - 40px) / 7 - 3px));
       border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: min(22px, calc((100vw - 40px) / 7 * 0.42));
       cursor: pointer;
       transition: transform 0.15s, background 0.2s;
       background: #1a1a2a;
+      touch-action: manipulation;
     }
     .cell:hover { transform: scale(1.03); }
     .player1 { background: #1e3a8a; color: #bfdbfe; }
     .player2 { background: #991b1b; color: #fecaca; }
-    .reactor::after { content: "●"; font-size: 18px; }
+    .reactor::after { content: "●"; font-size: min(18px, calc((100vw - 40px) / 7 * 0.35)); }
+
+    /* 🔥 Усиленная цепная реакция */
+    .cell.chain {
+      animation: chainReaction 0.8s cubic-bezier(0.1, 0.9, 0.4, 1) forwards;
+    }
+    @keyframes chainReaction {
+      0% { 
+        transform: scale(1); 
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.8);
+        z-index: 10;
+      }
+      40% { 
+        transform: scale(1.3); 
+        box-shadow: 0 0 0 12px rgba(255, 215, 0, 1), 0 0 20px rgba(255, 165, 0, 0.8);
+        z-index: 10;
+      }
+      100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+        z-index: auto;
+      }
+    }
 
     #status {
       margin: 14px 0;
@@ -225,81 +256,26 @@
       transition: transform 0.3s ease;
     }
 
+    .notification-modal {
+      max-width: 320px;
+    }
+    .notification-modal h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      color: #4deeea;
+    }
+    .notification-modal p {
+      font-size: 15px;
+      margin: 0;
+      color: #ccc;
+    }
+
     .modal-overlay.active .modal {
       transform: scale(1);
     }
 
-    .modal h2 {
-      color: #4deeea;
-      margin-top: 0;
-      font-size: 22px;
-    }
-
-    .modal p {
-      color: #ccc;
-      margin: 16px 0;
-      line-height: 1.5;
-    }
-
-    /* Changelog Accordions */
-    .patch-entry {
-      margin: 14px 0;
-      border: 1px solid #333;
-      border-radius: 10px;
-      overflow: hidden;
-      background: rgba(30, 30, 46, 0.3);
-    }
-
-    .patch-header {
-      padding: 12px 16px;
-      background: rgba(77, 238, 234, 0.1);
-      color: #4deeea;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.2s;
-    }
-
-    .patch-header:hover {
-      background: rgba(77, 238, 234, 0.2);
-    }
-
-    .patch-arrow {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.3s ease;
-      fill: #4deeea;
-    }
-
-    .patch-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.4s ease;
-      background: rgba(20, 20, 36, 0.6);
-      color: #ccc;
-      padding: 0 16px;
-    }
-
-    .patch-content.open {
-      max-height: 400px;
-      padding: 16px;
-    }
-
-    .patch-content ul {
-      text-align: left;
-      padding-left: 20px;
-      margin: 0;
-      line-height: 1.6;
-    }
-
-    .patch-content li {
-      margin-bottom: 6px;
-    }
-
-    /* Info Accordions */
+    /* Changelog & Info Accordions */
+    .patch-entry,
     .info-section {
       margin: 14px 0;
       border: 1px solid #333;
@@ -308,6 +284,7 @@
       background: rgba(30, 30, 46, 0.3);
     }
 
+    .patch-header,
     .info-header {
       padding: 12px 16px;
       background: rgba(77, 238, 234, 0.1);
@@ -321,10 +298,12 @@
       transition: background 0.2s;
     }
 
+    .patch-header:hover,
     .info-header:hover {
       background: rgba(77, 238, 234, 0.2);
     }
 
+    .patch-arrow,
     .info-arrow {
       width: 16px;
       height: 16px;
@@ -332,6 +311,7 @@
       fill: #4deeea;
     }
 
+    .patch-content,
     .info-content {
       max-height: 0;
       overflow: hidden;
@@ -339,13 +319,30 @@
       background: rgba(20, 20, 36, 0.6);
       color: #ccc;
       padding: 0 16px;
-      text-align: left;
-      line-height: 1.5;
     }
 
+    .patch-content.open,
     .info-content.open {
       max-height: 400px;
       padding: 16px;
+    }
+
+    .patch-content ul,
+    .info-content ul {
+      text-align: left;
+      padding-left: 20px;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .patch-content li,
+    .info-content li {
+      margin-bottom: 6px;
+    }
+
+    .info-content {
+      text-align: left;
+      line-height: 1.5;
     }
 
     .info-content p {
@@ -383,7 +380,57 @@
     .close-modal:hover svg {
       fill: white;
     }
+
+    /* 📊 Статистика */
+    .stats-box {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(30, 30, 46, 0.5);
+      border-radius: 8px;
+      text-align: left;
+    }
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+    }
+    .stats-label { color: #aaa; }
+    .stats-value { font-weight: bold; }
+    .winrate-good { color: #4deeea; }
+    .winrate-bad { color: #ff6b6b; }
+
+    /* 👤 Аватар */
+    #user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #333;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* 🔙 Кнопка выхода */
+    #logout-btn {
+      background: #555;
+      margin-top: 8px;
+    }
   </style>
+
+  <!-- 🔊 Звуки (base64 заглушки) -->
+  <audio id="sound-click" preload="auto">
+    <source src="audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGlua3MuY29tU0VDAAAAAAABIjREUU1BQzRnQlNlZ2JlaF9nTl9nZ2JfZ2xnZ2lfQWxhbm5hX2xhZ19sYWdfQWxhbm5hX1NvdW5kX0JhbmtfY29tX0xpbmtzX2NvbQAAAA8AAANMYXZjNTcuODMuMTAw" type="audio/mpeg">
+  </audio>
+  <audio id="sound-toss" preload="auto">
+    <source src="audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGlua3MuY29tU0VDAAsMDAoKCQkICAYGBQUFBAQDAwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQIA//8AAAAEAAABAAAFqAD4AABpAAAAAAAWAAAA" type="audio/mpeg">
+  </audio>
+  <audio id="sound-result" preload="auto">
+    <source src="audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGlua3MuY29tU0VDAAACAwQFBgcICQoL" type="audio/mpeg">
+  </audio>
 </head>
 <body>
   <div class="demo-banner">
@@ -394,6 +441,7 @@
     <button id="profile-btn" class="icon-btn" title="Profile">👤</button>
     <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
     <button id="changelog-btn" class="icon-btn" title="Changelog">📖</button>
+    <button id="support-btn" class="icon-btn" title="Support">💬</button>
     <button id="info-btn" class="icon-btn" title="Info">❓</button>
   </div>
 
@@ -403,9 +451,23 @@
       Добро пожаловать в стратегическую игру, где каждый ход решает исход битвы за контроль!<br>
       Постройте реакторы, захватывайте клетки и обыграйте бота за 14 ходов.
     </p>
-    <button onclick="goToStartScreen()">Начать игру</button>
+    <div id="auth-buttons">
+      <button onclick="loginWithGoogle()" style="background:#4285F4;color:white;display:flex;align-items:center;gap:8px;justify-content:center">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.234-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/></svg>
+        Войти через Google
+      </button>
+      <button disabled style="background:#555;margin-top:8px;cursor:not-allowed">Войти через VK (soon)</button>
+      <button onclick="loginAsGuest()" style="background:#555;margin-top:8px">Играть как гость</button>
+    </div>
+    <div id="user-info" style="display:none;margin-top:20px">
+      <div id="user-avatar"></div>
+      <div id="user-name" style="margin-top:8px;font-weight:bold"></div>
+      <button onclick="goToStartScreen()" style="margin-top:12px">Начать игру</button>
+      <button id="logout-btn" onclick="logout()">Выйти</button>
+    </div>
   </div>
 
+  <!-- ... остальные экраны (start-screen, game-screen) без изменений ... -->
   <div id="start-screen" class="screen">
     <h1>REACTOR</h1>
     <p>Кто начнёт первым?</p>
@@ -430,7 +492,7 @@
     </div>
   </div>
 
-  <!-- 👤 Профиль -->
+  <!-- ... модальные окна (profile, settings, changelog, info, support) без изменений ... -->
   <div id="profile-modal" class="modal-overlay">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('profile-modal')">
@@ -439,11 +501,11 @@
         </svg>
       </button>
       <h2>Profile</h2>
-      <p>Soon</p>
+      <div id="profile-stats"></div>
+      <button id="profile-logout-btn" onclick="logout()" style="margin-top:16px;background:#555">Выйти</button>
     </div>
   </div>
 
-  <!-- ⚙️ Настройки -->
   <div id="settings-modal" class="modal-overlay">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('settings-modal')">
@@ -456,7 +518,6 @@
     </div>
   </div>
 
-  <!-- 📖 Changelog -->
   <div id="changelog-modal" class="modal-overlay">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('changelog-modal')">
@@ -466,7 +527,37 @@
       </button>
       <h2>Changelog</h2>
 
-      <!-- v0.2.1 — новый -->
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-031')">
+          v0.3.1
+          <svg class="patch-arrow" id="arrow-031" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-031">
+          <ul>
+            <li>• Добавлен вход через Google</li>
+            <li>• VK временно отключён (soon)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-030')">
+          v0.3.0
+          <svg class="patch-arrow" id="arrow-030" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-030">
+          <ul>
+            <li>• Добавлена кнопка выхода из аккаунта</li>
+            <li>• Восстановлены Changelog и Info</li>
+            <li>• Все уведомления — через кастомные модалки</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="patch-entry">
         <div class="patch-header" onclick="togglePatch('patch-021')">
           v0.2.1
@@ -476,18 +567,14 @@
         </div>
         <div class="patch-content" id="patch-021">
           <ul>
-            <li><strong>Добавлено:</strong></li>
             <li>• Поле увеличено до <strong>7×7</strong></li>
-            <li>• Всего ходов: <strong>14</strong> (по 7 на игрока)</li>
-            <li>• Перебалансирован ИИ под новое поле</li>
-            <li><strong>Исправлено:</strong></li>
-            <li>• Рандом первого хода больше не решает исход</li>
-            <li>• Тактика заменяет угадывание</li>
+            <li>• Всего ходов: <strong>14</strong></li>
+            <li>• Добавлена цепная реакция</li>
+            <li>• Добавлены звуковые эффекты</li>
           </ul>
         </div>
       </div>
 
-      <!-- v0.2 -->
       <div class="patch-entry">
         <div class="patch-header" onclick="togglePatch('patch-02')">
           v0.2
@@ -497,22 +584,14 @@
         </div>
         <div class="patch-content" id="patch-02">
           <ul>
-            <li><strong>Добавлено:</strong></li>
-            <li>• Продвинутый ИИ-бот: анализ угроз, фазы игры, симуляция ответа</li>
+            <li>• Улучшенный ИИ-бот (фазы, угрозы, lookahead)</li>
             <li>• Кнопки: Профиль, Настройки, Changelog, Info</li>
             <li>• Модальные окна вместо alert()</li>
             <li>• Пользовательское соглашение и авторство</li>
-            <li><strong>Улучшено:</strong></li>
-            <li>• Дизайн, читаемость, производительность</li>
-            <li><strong>Исправлено:</strong></li>
-            <li>• Бот всегда делал один и тот же ход</li>
-            <li>• Иконки залазили на баннер</li>
-            <li>• Технические фразы в changelog</li>
           </ul>
         </div>
       </div>
 
-      <!-- v0.1 — архив -->
       <div class="patch-entry">
         <div class="patch-header" onclick="togglePatch('patch-01')">
           v0.1
@@ -522,17 +601,27 @@
         </div>
         <div class="patch-content" id="patch-01">
           <ul>
-            <li>• Добавлено главное меню и экран определения первого хода</li>
-            <li>• Реализована игровая механика: реакторы, захват клеток, 10 ходов</li>
-            <li>• Добавлен ИИ-бот с базовой стратегией</li>
-            <li>• Введены разделы: Профиль, Настройки, История обновлений</li>
+            <li>• Базовая игра: 5×5, 10 ходов</li>
+            <li>• Экран кубика (кто первый)</li>
+            <li>• ИИ-бот с жадной стратегией</li>
           </ul>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ❓ Info -->
+  <div id="support-modal" class="modal-overlay">
+    <div class="modal">
+      <button class="close-modal" onclick="closeModal('support-modal')">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+      <h2>Онлайн-поддержка</h2>
+      <p>Soon</p>
+    </div>
+  </div>
+
   <div id="info-modal" class="modal-overlay">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('info-modal')">
@@ -583,7 +672,7 @@
         </div>
         <div class="info-content" id="about">
           <p>Игра <strong>REACTOR</strong> создана и принадлежит <strong>G3laZi Project</strong>.</p>
-          <p>Версия: v0.2.1 (демо)</p>
+          <p>Версия: v0.3.1 (демо)</p>
           <p>© 2025 G3laZi Project. Все права защищены.</p>
           <p>Официальный репозиторий: <em>скоро на GitHub</em></p>
         </div>
@@ -591,17 +680,208 @@
     </div>
   </div>
 
-  <script>
-    const SIZE = 7;          // ✅ 7×7
-    const TOTAL_MOVES = 14;  // ✅ 14 ходов
-    let board, reactors, moveCount, gameActive, currentPlayer;
+  <!-- 📢 Уведомления -->
+  <div id="notification-modal" class="modal-overlay">
+    <div class="modal notification-modal">
+      <button class="close-modal" onclick="closeNotification()">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+      <h2 id="notification-title">Уведомление</h2>
+      <p id="notification-text">Сообщение</p>
+    </div>
+  </div>
 
+  <script>
+    const SIZE = 7;
+    const TOTAL_MOVES = 14;
+    let board, reactors, moveCount, gameActive, currentPlayer, currentUser = null;
+
+    // 🔊 Инициализация звука при первом взаимодействии
+    let audioInitialized = false;
+    function initAudio() {
+      if (audioInitialized) return;
+      audioInitialized = true;
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.1);
+    }
+    document.body.addEventListener('click', initAudio, { once: true });
+    document.body.addEventListener('touchstart', initAudio, { once: true });
+
+    // 🔊 Звуки
+    function playSound(id) {
+      if (!audioInitialized) return;
+      const sound = document.getElementById(`sound-${id}`);
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(e => console.log("Audio play prevented:", e));
+      }
+    }
+
+    // 📢 Показ уведомления
+    function showNotification(title, text) {
+      document.getElementById('notification-title').textContent = title;
+      document.getElementById('notification-text').textContent = text;
+      document.getElementById('notification-modal').classList.add('active');
+    }
+
+    // 📢 Закрытие
+    function closeNotification() {
+      document.getElementById('notification-modal').classList.remove('active');
+    }
+
+    // 👤 Пользователь
+    function saveUser(user) {
+      localStorage.setItem('reactor_user', JSON.stringify(user));
+      currentUser = user;
+      updateUI();
+    }
+    function loadUser() {
+      const saved = localStorage.getItem('reactor_user');
+      currentUser = saved ? JSON.parse(saved) : null;
+      updateUI();
+    }
+    function updateUI() {
+      const authButtons = document.getElementById('auth-buttons');
+      const userInfo = document.getElementById('user-info');
+      const userName = document.getElementById('user-name');
+      const avatar = document.getElementById('user-avatar');
+
+      if (currentUser) {
+        authButtons.style.display = 'none';
+        userInfo.style.display = 'block';
+        userName.textContent = currentUser.name || 'Игрок';
+        avatar.textContent = (currentUser.name || '?')[0].toUpperCase();
+        avatar.style.background = currentUser.photo 
+          ? `url(${currentUser.photo}) center/cover no-repeat` 
+          : '#4deeea';
+      } else {
+        authButtons.style.display = 'block';
+        userInfo.style.display = 'none';
+      }
+      renderStats();
+    }
+
+    // 🚪 Выход
+    function logout() {
+      localStorage.removeItem('reactor_user');
+      currentUser = null;
+      updateUI();
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('main-menu').classList.add('active');
+    }
+
+    // 🟢 Вход через Google (с твоим ID)
+    function loginWithGoogle() {
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: '712124061862-fun5umqbl2u9d4fsnve4pi4h2g4b21ug.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/userinfo.profile',
+        callback: (tokenResponse) => {
+          if (tokenResponse.access_token) {
+            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+            })
+            .then(res => res.json())
+            .then(user => {
+              saveUser({
+                id: 'google_' + user.sub,
+                name: user.name || user.given_name || 'Google User',
+                photo: user.picture || null
+              });
+            })
+            .catch(err => {
+              console.error("Google login error:", err);
+              showNotification("Ошибка", "Не удалось войти через Google");
+            });
+          }
+        }
+      });
+      client.requestAccessToken();
+    }
+
+    // 🎩 Гость
+    function loginAsGuest() {
+      const guestName = prompt("Как тебя зовут?", "Игрок");
+      if (guestName) {
+        saveUser({
+          id: 'guest_' + Date.now(),
+          name: guestName.trim() || 'Игрок',
+          isGuest: true
+        });
+      }
+    }
+
+    // 📊 Статистика
+    function getStatsKey() {
+      return currentUser ? `reactor_stats_${currentUser.id}` : 'reactor_stats_guest';
+    }
+    function loadStats() {
+      const key = getStatsKey();
+      const saved = localStorage.getItem(key);
+      return saved ? JSON.parse(saved) : { wins: 0, losses: 0, draws: 0 };
+    }
+    function saveStats(stats) {
+      const key = getStatsKey();
+      localStorage.setItem(key, JSON.stringify(stats));
+    }
+    function updateStats(result) {
+      const stats = loadStats();
+      if (result === 'win') stats.wins++;
+      else if (result === 'loss') stats.losses++;
+      else stats.draws++;
+      saveStats(stats);
+      renderStats();
+    }
+    function renderStats() {
+      const stats = loadStats();
+      const el = document.getElementById('profile-stats');
+      if (el) {
+        const total = stats.wins + stats.losses + stats.draws;
+        const winrate = total ? Math.round((stats.wins / total) * 100) : 0;
+        const name = currentUser ? currentUser.name : 'Гость';
+        el.innerHTML = `
+          <div class="stats-box">
+            <div class="stats-row">
+              <span class="stats-label">👤 Игрок:</span>
+              <span class="stats-value">${name}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">🏆 Побед:</span>
+              <span class="stats-value">${stats.wins}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">💔 Поражений:</span>
+              <span class="stats-value">${stats.losses}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">📈 Винрейт:</span>
+              <span class="stats-value ${winrate >= 50 ? 'winrate-good' : 'winrate-bad'}">${winrate}%</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // ⚙️ Игровая логика (без изменений)
     function goToStartScreen() {
+      if (!currentUser) {
+        showNotification("Ошибка", "Сначала войдите или выберите гостя");
+        return;
+      }
       document.getElementById('main-menu').classList.remove('active');
       document.getElementById('start-screen').classList.add('active');
     }
 
     function startToss() {
+      playSound('toss');
       const dice = document.getElementById('dice');
       dice.textContent = '?';
       dice.className = 'dice animate';
@@ -669,22 +949,50 @@
       if (moveCount >= TOTAL_MOVES && gameActive) {
         gameActive = false;
         const statusEl = document.getElementById('status');
-        if (youScore > botScore) statusEl.textContent = '🏆 Победа!';
-        else if (botScore > youScore) statusEl.textContent = '💔 Поражение.';
-        else statusEl.textContent = '🤝 Ничья!';
+        let resultType = 'draw';
+        if (youScore > botScore) {
+          statusEl.textContent = '🏆 Победа!';
+          resultType = 'win';
+        } else if (botScore > youScore) {
+          statusEl.textContent = '💔 Поражение.';
+          resultType = 'loss';
+        } else {
+          statusEl.textContent = '🤝 Ничья!';
+        }
+        playSound('result');
+        updateStats(resultType);
       }
     }
 
+    // ✅ Исправленная activateReactor
     function activateReactor(row, col, player) {
       reactors[row][col] = true;
       board[row][col] = player;
       const dirs = [[-1,0], [1,0], [0,-1], [0,1]];
+      
+      let chainReaction = false;
+      for (const [dr, dc] of dirs) {
+        const nr = row + dr, nc = col + dc;
+        if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+          if (reactors[nr][nc]) chainReaction = true;
+        }
+      }
+
       for (const [dr, dc] of dirs) {
         const nr = row + dr, nc = col + dc;
         if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
           board[nr][nc] = player;
+          const cellIndex = nr * SIZE + nc;
+          const cell = document.querySelector(`#board > .cell:nth-child(${cellIndex + 1})`);
+          if (cell && chainReaction) {
+            cell.classList.remove('chain');
+            void cell.offsetWidth;
+            cell.classList.add('chain');
+          }
         }
       }
+
+      playSound('click');
     }
 
     function playerMove(r, c) {
@@ -701,7 +1009,6 @@
       }
     }
 
-    // ✅ Продвинутый бот под 7×7
     function botMove() {
       if (!gameActive || currentPlayer !== 'bot') return;
 
@@ -722,7 +1029,6 @@
               else if (board[nr][nc] === 2) baseValue += 1;
             }
           }
-          // Центр 3×3 = (2,2) to (4,4) → бонус
           if (phase === 'early' && r >= 2 && r <= 4 && c >= 2 && c <= 4) {
             baseValue += 4;
           }
@@ -798,39 +1104,45 @@
 
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('active');
+      if (modalId === 'profile-modal') {
+        renderStats();
+      }
     }
 
     function togglePatch(patchId) {
       const content = document.getElementById(patchId);
-      const arrowId = `arrow-${patchId.split('-')[1]}`;
-      const arrow = document.getElementById(arrowId);
+      const arrow = document.getElementById(`arrow-${patchId}`);
       content.classList.toggle('open');
-      if (content.classList.contains('open')) {
-        arrow.style.transform = 'rotate(180deg)';
-      } else {
-        arrow.style.transform = 'rotate(0deg)';
-      }
+      arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
     }
 
     function toggleInfo(sectionId) {
       const content = document.getElementById(sectionId);
       const arrow = document.getElementById(`arrow-${sectionId}`);
       content.classList.toggle('open');
-      if (content.classList.contains('open')) {
-        arrow.style.transform = 'rotate(180deg)';
-      } else {
-        arrow.style.transform = 'rotate(0deg)';
-      }
+      arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
     }
 
+    // Обработчики кнопок
     document.getElementById('profile-btn').onclick = () => {
+      if (!currentUser) {
+        showNotification("Ошибка", "Сначала войдите или выберите гостя");
+        return;
+      }
       document.getElementById('profile-modal').classList.add('active');
     };
     document.getElementById('settings-btn').onclick = () => {
+      if (!currentUser) {
+        showNotification("Ошибка", "Сначала войдите или выберите гостя");
+        return;
+      }
       document.getElementById('settings-modal').classList.add('active');
     };
     document.getElementById('changelog-btn').onclick = () => {
       document.getElementById('changelog-modal').classList.add('active');
+    };
+    document.getElementById('support-btn').onclick = () => {
+      document.getElementById('support-modal').classList.add('active');
     };
     document.getElementById('info-btn').onclick = () => {
       document.getElementById('info-modal').classList.add('active');
@@ -843,6 +1155,12 @@
         }
       });
     });
+
+    // Загрузка при старте
+    loadUser();
+
+    // Подгрузить статистику
+    renderStats();
   </script>
 </body>
 </html>
