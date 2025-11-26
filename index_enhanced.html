@@ -739,8 +739,10 @@
   </style>
 </head>
 <body>
+  <div class="background-animation" id="background-animation"></div>
+  
   <div class="demo-banner">
-    ДЕМО-ВЕРСИЯ
+    УЛУЧШЕННАЯ ВЕРСИЯ
   </div>
 
   <div id="top-ui">
@@ -752,7 +754,7 @@
   </div>
 
   <div id="main-menu" class="screen active">
-    <h1>REACTOR</h1>
+    <h1 class="pulse">REACTOR</h1>
     <p class="subtitle">
       Добро пожаловать в стратегическую игру, где каждый ход решает исход битвы за контроль!<br>
       Постройте реакторы, захватывайте клетки и обыграйте бота за 14 ходов.
@@ -769,13 +771,12 @@
     </div>
     <div id="user-info" style="display:none;margin-top:30px">
       <div id="user-avatar"></div>
-      <div id="user-name" style="margin-top:12px;font-weight:bold;font-size:20px"></div>
-      <button onclick="goToStartScreen()" style="margin-top:16px;padding:12px 28px">Начать игру</button>
-      <button id="logout-btn" onclick="logout()" style="margin-top:10px;padding:10px 24px">Выйти</button>
+      <div id="user-name" style="margin-top:12px;font-weight:bold;font-size:22px"></div>
+      <button onclick="goToStartScreen()" style="margin-top:16px;padding:14px 32px;font-size:16px">Начать игру</button>
+      <button id="logout-btn" onclick="logout()" style="margin-top:12px;padding:12px 28px">Выйти</button>
     </div>
   </div>
 
-  <!-- Остальные экраны без изменений -->
   <div id="start-screen" class="screen">
     <h1>REACTOR</h1>
     <p>Кто начнёт первым?</p>
@@ -800,7 +801,7 @@
     </div>
   </div>
 
-  <!-- Модальные окна (profile, changelog, info и т.д.) — как в v0.3.1 -->
+  <!-- Модальные окна -->
   <div id="profile-modal" class="modal-overlay">
     <div class="modal">
       <button class="close-modal" onclick="closeModal('profile-modal')">
@@ -808,9 +809,9 @@
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
         </svg>
       </button>
-      <h2>Profile</h2>
+      <h2>Профиль</h2>
       <div id="profile-stats"></div>
-      <button id="profile-logout-btn" onclick="logout()" style="margin-top:16px;background:#555">Выйти</button>
+      <button id="profile-logout-btn" onclick="logout()" style="margin-top:16px;background:linear-gradient(45deg, #555, #777)">Выйти</button>
     </div>
   </div>
 
@@ -821,7 +822,7 @@
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
         </svg>
       </button>
-      <h2>Settings</h2>
+      <h2>Настройки</h2>
       <p>Soon</p>
     </div>
   </div>
@@ -833,7 +834,24 @@
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
         </svg>
       </button>
-      <h2>Changelog</h2>
+      <h2>Список изменений</h2>
+
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-033')">
+          v0.3.3
+          <svg class="patch-arrow" id="arrow-033" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-033">
+          <ul>
+            <li>• Улучшенный визуальный дизайн с градиентами и анимациями</li>
+            <li>• Добавлены плавные переходы и эффекты</li>
+            <li>• Улучшена производительность и отзывчивость интерфейса</li>
+            <li>• Добавлены частицы анимации фона</li>
+          </ul>
+        </div>
+      </div>
 
       <div class="patch-entry">
         <div class="patch-header" onclick="togglePatch('patch-032')">
@@ -947,7 +965,7 @@
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
         </svg>
       </button>
-      <h2>Info</h2>
+      <h2>Информация</h2>
 
       <div class="info-section">
         <div class="info-header" onclick="toggleInfo('rules')">
@@ -990,14 +1008,14 @@
         </div>
         <div class="info-content" id="about">
           <p>Игра <strong>REACTOR</strong> создана и принадлежит <strong>G3laZi Project</strong>.</p>
-          <p>Версия: v0.3.2 (демо)</p>
+          <p>Версия: v0.3.3 (улучшенная)</p>
           <p>© 2025 G3laZi Project. Все права защищены.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 📢 Уведомления -->
+  <!-- Уведомления -->
   <div id="notification-modal" class="modal-overlay">
     <div class="modal notification-modal">
       <button class="close-modal" onclick="closeNotification()">
@@ -1046,7 +1064,7 @@
     // Инициализация частиц при загрузке
     window.addEventListener('load', createBackgroundParticles);
 
-    // 🔊 Инициализация звука
+    // Звуки
     let audioInitialized = false;
     function initAudio() {
       if (audioInitialized) return;
@@ -1063,7 +1081,6 @@
     document.body.addEventListener('click', initAudio, { once: true });
     document.body.addEventListener('touchstart', initAudio, { once: true });
 
-    // 🔊 Звуки
     function playSound(id) {
       if (!audioInitialized) return;
       const sound = document.getElementById(`sound-${id}`);
@@ -1073,7 +1090,7 @@
       }
     }
 
-    // 📢 Уведомления
+    // Уведомления
     function showNotification(title, text) {
       document.getElementById('notification-title').textContent = title;
       document.getElementById('notification-text').textContent = text;
@@ -1083,7 +1100,7 @@
       document.getElementById('notification-modal').classList.remove('active');
     }
 
-    // 👤 Пользователь
+    // Пользователь
     function saveUser(user) {
       localStorage.setItem('reactor_user', JSON.stringify(user));
       currentUser = user;
@@ -1106,8 +1123,8 @@
         userName.textContent = currentUser.name || 'Игрок';
         avatar.textContent = (currentUser.name || '?')[0].toUpperCase();
         avatar.style.background = currentUser.photo 
-          ? `url(${currentUser.photo}) center/cover no-repeat` 
-          : '#4deeea';
+          ? `linear-gradient(45deg, #4deeea, #ff6b6b), url(${currentUser.photo}) center/cover no-repeat` 
+          : 'linear-gradient(45deg, #4deeea, #ff6b6b)';
       } else {
         authContainer.style.display = 'flex';
         userInfo.style.display = 'none';
@@ -1115,7 +1132,7 @@
       renderStats();
     }
 
-    // 🚪 Выход
+    // Выход
     function logout() {
       localStorage.removeItem('reactor_user');
       currentUser = null;
@@ -1125,7 +1142,7 @@
       document.getElementById('main-menu').classList.add('active');
     }
 
-    // 🟢 Google (с твоим ID + иконкой загрузки)
+    // Google
     function loginWithGoogle() {
       const btn = document.getElementById('google-btn');
       btn.classList.add('loading');
@@ -1159,7 +1176,7 @@
       client.requestAccessToken();
     }
 
-    // 🎩 Гость
+    // Гость
     function loginAsGuest() {
       const guestName = prompt("Как тебя зовут?", "Игрок");
       if (guestName) {
@@ -1171,7 +1188,7 @@
       }
     }
 
-    // 📊 Статистика
+    // Статистика
     function getStatsKey() {
       return currentUser ? `reactor_stats_${currentUser.id}` : 'reactor_stats_guest';
     }
@@ -1214,15 +1231,23 @@
               <span class="stats-value">${stats.losses}</span>
             </div>
             <div class="stats-row">
+              <span class="stats-label">🤝 Ничьих:</span>
+              <span class="stats-value">${stats.draws}</span>
+            </div>
+            <div class="stats-row">
               <span class="stats-label">📈 Винрейт:</span>
               <span class="stats-value ${winrate >= 50 ? 'winrate-good' : 'winrate-bad'}">${winrate}%</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">📊 Всего игр:</span>
+              <span class="stats-value">${total}</span>
             </div>
           </div>
         `;
       }
     }
 
-    // ⚙️ Игровая логика (без изменений)
+    // Игровая логика
     function goToStartScreen() {
       if (!currentUser) {
         showNotification("Ошибка", "Сначала войдите или выберите гостя");
@@ -1237,11 +1262,15 @@
       const dice = document.getElementById('dice');
       dice.textContent = '?';
       dice.className = 'dice animate';
+      dice.style.border = '3px solid #4deeea';
+      dice.style.boxShadow = '0 0 20px rgba(77, 238, 234, 0.3)';
 
       setTimeout(() => {
         const firstPlayer = Math.random() > 0.5 ? 'human' : 'bot';
         dice.textContent = firstPlayer === 'human' ? '👤' : '🤖';
         dice.style.color = firstPlayer === 'human' ? '#4deeea' : '#ff6b6b';
+        dice.style.border = `3px solid ${firstPlayer === 'human' ? '#4deeea' : '#ff6b6b'}`;
+        dice.style.boxShadow = `0 0 30px ${firstPlayer === 'human' ? 'rgba(77, 238, 234, 0.6)' : 'rgba(255, 107, 107, 0.6)'}`;
         dice.classList.remove('animate');
 
         setTimeout(() => {
@@ -1262,8 +1291,16 @@
       const statusEl = document.getElementById('status');
       if (currentPlayer === 'human') {
         statusEl.textContent = 'Твой ход — поставь реактор';
+        statusEl.style.background = 'linear-gradient(45deg, #4deeea, #ff6b6b)';
+        statusEl.style.webkitBackgroundClip = 'text';
+        statusEl.style.webkitTextFillColor = 'transparent';
+        statusEl.style.backgroundClip = 'text';
       } else {
         statusEl.textContent = 'Бот ходит первым...';
+        statusEl.style.background = 'linear-gradient(45deg, #ff6b6b, #4deeea)';
+        statusEl.style.webkitBackgroundClip = 'text';
+        statusEl.style.webkitTextFillColor = 'transparent';
+        statusEl.style.backgroundClip = 'text';
         render();
         setTimeout(botMove, 800);
       }
@@ -1304,24 +1341,30 @@
         let resultType = 'draw';
         if (youScore > botScore) {
           statusEl.textContent = '🏆 Победа!';
+          statusEl.style.background = 'linear-gradient(45deg, #4deeea, #a8e6cf)';
           resultType = 'win';
         } else if (botScore > youScore) {
           statusEl.textContent = '💔 Поражение.';
+          statusEl.style.background = 'linear-gradient(45deg, #ff6b6b, #ff9a8b)';
           resultType = 'loss';
         } else {
           statusEl.textContent = '🤝 Ничья!';
+          statusEl.style.background = 'linear-gradient(45deg, #ffd700, #ffa500)';
         }
+        statusEl.style.webkitBackgroundClip = 'text';
+        statusEl.style.webkitTextFillColor = 'transparent';
+        statusEl.style.backgroundClip = 'text';
         playSound('result');
         updateStats(resultType);
       }
     }
 
-    // ✅ Исправленная activateReactor
+    // Исправленная activateReactor
     function activateReactor(row, col, player) {
       reactors[row][col] = true;
       board[row][col] = player;
       const dirs = [[-1,0], [1,0], [0,-1], [0,1]];
-      
+
       let chainReaction = false;
       for (const [dr, dc] of dirs) {
         const nr = row + dr, nc = col + dc;
@@ -1354,6 +1397,10 @@
       currentPlayer = 'bot';
       if (moveCount < TOTAL_MOVES) {
         document.getElementById('status').textContent = 'Ход бота...';
+        document.getElementById('status').style.background = 'linear-gradient(45deg, #ff6b6b, #4deeea)';
+        document.getElementById('status').style.webkitBackgroundClip = 'text';
+        document.getElementById('status').style.webkitTextFillColor = 'transparent';
+        document.getElementById('status').style.backgroundClip = 'text';
         render();
         setTimeout(botMove, 600);
       } else {
@@ -1445,6 +1492,10 @@
       currentPlayer = 'human';
       if (moveCount < TOTAL_MOVES) {
         document.getElementById('status').textContent = 'Твой ход — поставь реактор';
+        document.getElementById('status').style.background = 'linear-gradient(45deg, #4deeea, #ff6b6b)';
+        document.getElementById('status').style.webkitBackgroundClip = 'text';
+        document.getElementById('status').style.webkitTextFillColor = 'transparent';
+        document.getElementById('status').style.backgroundClip = 'text';
       }
       render();
     }
@@ -1484,7 +1535,6 @@
       }
       document.getElementById('profile-modal').classList.add('active');
     };
-    // ... остальные обработчики (settings, changelog и т.д.) — как в v0.3.1
 
     document.getElementById('settings-btn').onclick = () => {
       if (!currentUser) {
@@ -1513,14 +1563,12 @@
 
     // Загрузка при старте
     loadUser();
-
-    // Подгрузить статистику
     renderStats();
 
-    // 💡 Подсказка для Google OAuth (в консоли)
+    // Подсказка для Google OAuth
     console.log(
-      "%c⚠️ Google OAuth: Если ошибка 400 — добавьте в Google Cloud Console:\n" +
-      "http://localhost\nhttp://localhost:8000\nhttp://127.0.0.1\nhttps://ваш-домен.ру",
+      "%c⚠️ Google OAuth: Если ошибка 400 — добавьте в Google Cloud Console:\\n" +
+      "http://localhost\\nhttp://localhost:8000\\nhttp://127.0.0.1\\nhttps://ваш-домен.ру",
       "color: #ff6b6b; font-weight: bold;"
     );
   </script>
