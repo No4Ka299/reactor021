@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>REACTOR — Демо</title>
-  <!-- 🔵 Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>REACTOR — Улучшенная версия</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
-      background: #0d0d1a;
+      background: linear-gradient(135deg, #0d0d1a, #1a1a2e);
       color: white;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
@@ -21,10 +25,25 @@
       -ms-user-select: none;
       user-select: none;
       touch-action: manipulation;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 10% 20%, rgba(77, 238, 234, 0.1) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 1;
     }
 
     .demo-banner {
-      background: #ff3b30;
+      background: linear-gradient(45deg, #ff3b30, #ff6b6b);
       color: white;
       padding: 8px;
       font-weight: bold;
@@ -34,6 +53,7 @@
       position: relative;
       z-index: 30;
       text-align: center;
+      box-shadow: 0 2px 10px rgba(255, 59, 48, 0.3);
     }
 
     #top-ui {
@@ -46,11 +66,15 @@
     }
 
     .icon-btn {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: rgba(30, 30, 46, 0.7);
-      border: 1px solid #4deeea;
+      background: rgba(30, 30, 46, 0.8);
+      border: 2px solid transparent;
+      background-image: linear-gradient(rgba(13, 13, 26, 1), rgba(13, 13, 26, 1)), 
+                        linear-gradient(45deg, #4deeea, #ff6b6b);
+      background-origin: border-box;
+      background-clip: content-box, border-box;
       color: white;
       font-size: 16px;
       display: flex;
@@ -58,14 +82,32 @@
       justify-content: center;
       cursor: pointer;
       backdrop-filter: blur(4px);
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .icon-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      transition: all 0.3s ease;
+      z-index: -1;
     }
 
     .icon-btn:hover {
-      background: rgba(77, 238, 234, 0.2);
-      transform: scale(1.1);
-      border-color: #4deeea;
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 0 20px rgba(77, 238, 234, 0.5);
+    }
+
+    .icon-btn:hover::before {
+      transform: rotate(45deg) translate(20%, 20%);
     }
 
     .icon-btn:focus {
@@ -88,34 +130,48 @@
     .active { display: flex !important; }
 
     h1 {
-      font-size: 32px;
-      color: #4deeea;
+      font-size: 36px;
+      background: linear-gradient(45deg, #4deeea, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 20px;
       z-index: 5;
+      text-shadow: 0 0 20px rgba(77, 238, 234, 0.3);
+      font-weight: 700;
+      letter-spacing: 1px;
     }
 
     .subtitle {
       font-size: 18px;
-      color: #aaa;
+      color: #ccc;
       margin-bottom: 30px;
       max-width: 500px;
       line-height: 1.5;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
     .dice {
-      width: 80px;
-      height: 80px;
-      background: #1e1e2e;
-      border: 3px solid #555;
-      border-radius: 16px;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+      border: 3px solid #4deeea;
+      border-radius: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 40px;
+      font-size: 48px;
       font-weight: bold;
       margin: 30px 0;
       z-index: 5;
       position: relative;
+      box-shadow: 0 0 20px rgba(77, 238, 234, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .dice:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(77, 238, 234, 0.5);
     }
 
     .dice.animate {
@@ -123,18 +179,18 @@
     }
 
     @keyframes toss {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      30% { transform: translateY(-120px) rotate(180deg); }
-      60% { transform: translateY(-60px) rotate(360deg); }
-      80% { transform: translateY(-20px) rotate(540deg); }
-      100% { transform: translateY(0) rotate(720deg); opacity: 1; }
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      30% { transform: translateY(-120px) rotate(180deg) scale(1.2); }
+      60% { transform: translateY(-60px) rotate(360deg) scale(1.1); }
+      80% { transform: translateY(-20px) rotate(540deg) scale(1.05); }
+      100% { transform: translateY(0) rotate(720deg) scale(1); opacity: 1; }
     }
 
     button {
-      padding: 10px 24px;
-      background: #4deeea;
+      padding: 12px 30px;
+      background: linear-gradient(45deg, #4deeea, #ff6b6b);
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       color: #000;
       font-weight: bold;
       font-size: 16px;
@@ -142,37 +198,112 @@
       margin-top: 20px;
       z-index: 5;
       position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(77, 238, 234, 0.4);
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: rotate(45deg);
+      transition: all 0.5s ease;
+      z-index: -1;
+    }
+
+    button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(77, 238, 234, 0.6);
+    }
+
+    button:hover::before {
+      transform: rotate(45deg) translate(20%, 20%);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.98);
     }
 
     #board {
       display: grid;
       grid-template-columns: repeat(7, min(52px, calc((100vw - 40px) / 7)));
-      grid-gap: 3px;
+      grid-gap: 4px;
       margin: 12px auto;
-      max-width: calc(7 * min(52px, (100vw - 40px) / 7) + 24px);
+      max-width: calc(7 * min(52px, (100vw - 40px) / 7) + 28px);
+      position: relative;
+      padding: 10px;
+      border-radius: 15px;
+      background: rgba(20, 20, 36, 0.3);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
     }
+    
     .cell {
-      width: min(52px, calc((100vw - 40px) / 7 - 3px));
-      height: min(52px, calc((100vw - 40px) / 7 - 3px));
-      border-radius: 6px;
+      width: min(52px, calc((100vw - 40px) / 7 - 4px));
+      height: min(52px, calc((100vw - 40px) / 7 - 4px));
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: min(22px, calc((100vw - 40px) / 7 * 0.42));
       cursor: pointer;
-      transition: transform 0.15s, background 0.2s;
-      background: #1a1a2a;
+      transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+      background: linear-gradient(145deg, #1a1a2a, #252538);
       touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
-    .cell:hover { transform: scale(1.03); }
-    .player1 { background: #1e3a8a; color: #bfdbfe; }
-    .player2 { background: #991b1b; color: #fecaca; }
-    .reactor::after { content: "●"; font-size: min(18px, calc((100vw - 40px) / 7 * 0.35)); }
+    
+    .cell::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.3s ease;
+      z-index: -1;
+    }
+    
+    .cell:hover { 
+      transform: scale(1.05); 
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    
+    .cell:hover::before {
+      transform: rotate(45deg) translate(10%, 10%);
+    }
+    
+    .player1 { 
+      background: linear-gradient(145deg, #1e3a8a, #2563eb); 
+      color: #bfdbfe; 
+      box-shadow: 0 0 10px rgba(30, 58, 138, 0.5);
+    }
+    
+    .player2 { 
+      background: linear-gradient(145deg, #991b1b, #dc2626); 
+      color: #fecaca; 
+      box-shadow: 0 0 10px rgba(153, 27, 27, 0.5);
+    }
+    
+    .reactor::after { 
+      content: "●"; 
+      font-size: min(20px, calc((100vw - 40px) / 7 * 0.38)); 
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    }
 
-    /* 🔥 Усиленная цепная реакция */
+    /* Усиленная цепная реакция */
     .cell.chain {
       animation: chainReaction 0.8s cubic-bezier(0.1, 0.9, 0.4, 1) forwards;
     }
+    
     @keyframes chainReaction {
       0% { 
         transform: scale(1); 
@@ -180,8 +311,8 @@
         z-index: 10;
       }
       40% { 
-        transform: scale(1.3); 
-        box-shadow: 0 0 0 12px rgba(255, 215, 0, 1), 0 0 20px rgba(255, 165, 0, 0.8);
+        transform: scale(1.4); 
+        box-shadow: 0 0 0 15px rgba(255, 215, 0, 1), 0 0 25px rgba(255, 165, 0, 0.8);
         z-index: 10;
       }
       100% { 
@@ -193,9 +324,14 @@
 
     #status {
       margin: 14px 0;
-      font-size: 18px;
+      font-size: 20px;
       min-height: 24px;
       font-weight: bold;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      background: linear-gradient(45deg, #4deeea, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     #score {
@@ -203,14 +339,27 @@
       justify-content: center;
       gap: 30px;
       margin: 8px 0;
-      font-size: 15px;
+      font-size: 16px;
+      position: relative;
+      z-index: 5;
     }
+    
     .score-box {
-      padding: 6px 16px;
-      border-radius: 10px;
+      padding: 8px 20px;
+      border-radius: 12px;
+      background: rgba(30, 30, 46, 0.6);
+      border: 2px solid #4deeea;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
-    .you { border: 2px solid #4deeea; }
-    .bot { border: 2px solid #ff6b6b; }
+    
+    .score-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(77, 238, 234, 0.4);
+    }
+    
+    .you { border-color: #4deeea; }
+    .bot { border-color: #ff6b6b; }
 
     #footer {
       margin: 20px auto;
@@ -218,6 +367,7 @@
       color: #666;
       max-width: 400px;
       line-height: 1.5;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
     .modal-overlay {
@@ -226,15 +376,15 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 100;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
+      transition: opacity 0.4s, visibility 0.4s;
     }
 
     .modal-overlay.active {
@@ -243,31 +393,34 @@
     }
 
     .modal {
-      background: #141424;
+      background: linear-gradient(145deg, #141424, #1a1a2e);
       border: 2px solid #4deeea;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 28px;
       width: 90%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
-      box-shadow: 0 0 20px rgba(77, 238, 234, 0.3);
+      box-shadow: 0 0 30px rgba(77, 238, 234, 0.4);
       position: relative;
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
+      transform: scale(0.8);
+      transition: transform 0.4s ease;
+      border-image: linear-gradient(45deg, #4deeea, #ff6b6b) 1;
     }
 
     .notification-modal {
-      max-width: 320px;
+      max-width: 340px;
     }
     .notification-modal h2 {
-      font-size: 18px;
+      font-size: 20px;
       margin: 0 0 12px;
       color: #4deeea;
+      text-shadow: 0 0 10px rgba(77, 238, 234, 0.3);
     }
     .notification-modal p {
-      font-size: 15px;
+      font-size: 16px;
       margin: 0;
       color: #ccc;
+      line-height: 1.5;
     }
 
     .modal-overlay.active .modal {
@@ -279,15 +432,15 @@
     .info-section {
       margin: 14px 0;
       border: 1px solid #333;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      background: rgba(30, 30, 46, 0.3);
+      background: rgba(30, 30, 46, 0.4);
     }
 
     .patch-header,
     .info-header {
-      padding: 12px 16px;
-      background: rgba(77, 238, 234, 0.1);
+      padding: 14px 18px;
+      background: linear-gradient(90deg, rgba(77, 238, 234, 0.15), rgba(255, 107, 107, 0.15));
       color: #4deeea;
       font-weight: bold;
       font-size: 16px;
@@ -295,19 +448,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: background 0.2s;
+      transition: background 0.3s;
     }
 
     .patch-header:hover,
     .info-header:hover {
-      background: rgba(77, 238, 234, 0.2);
+      background: linear-gradient(90deg, rgba(77, 238, 234, 0.25), rgba(255, 107, 107, 0.25));
     }
 
     .patch-arrow,
     .info-arrow {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.3s ease;
+      width: 18px;
+      height: 18px;
+      transition: transform 0.4s ease;
       fill: #4deeea;
     }
 
@@ -315,16 +468,16 @@
     .info-content {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.4s ease;
-      background: rgba(20, 20, 36, 0.6);
+      transition: max-height 0.5s ease, padding 0.5s ease;
+      background: rgba(20, 20, 36, 0.7);
       color: #ccc;
-      padding: 0 16px;
+      padding: 0 18px;
     }
 
     .patch-content.open,
     .info-content.open {
-      max-height: 400px;
-      padding: 16px;
+      max-height: 500px;
+      padding: 18px;
     }
 
     .patch-content ul,
@@ -337,7 +490,7 @@
 
     .patch-content li,
     .info-content li {
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .info-content {
@@ -351,19 +504,20 @@
 
     .close-modal {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 14px;
+      right: 14px;
       background: none;
       border: none;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       cursor: pointer;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      transition: background 0.2s;
+      transition: background 0.3s;
+      z-index: 10;
     }
 
     .close-modal:hover {
@@ -371,69 +525,192 @@
     }
 
     .close-modal svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       fill: #aaa;
-      transition: fill 0.2s;
+      transition: fill 0.3s;
     }
 
     .close-modal:hover svg {
       fill: white;
     }
 
-    /* 📊 Статистика */
-    .stats-box {
-      margin-top: 16px;
+    /* Рейтинговая система */
+    .rating-divisions {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 400px;
+      margin: 20px auto;
+      width: 100%;
+    }
+
+    .division-card {
+      background: linear-gradient(145deg, #1a1a2a, #252538);
+      border: 2px solid #4deeea;
+      border-radius: 15px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .division-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.3s ease;
+      z-index: -1;
+    }
+
+    .division-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(77, 238, 234, 0.4);
+    }
+
+    .division-card:hover::before {
+      transform: rotate(45deg) translate(10%, 10%);
+    }
+
+    .division-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .division-header.silver {
+      background: linear-gradient(45deg, #c0c0c0, #a0a0a0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .division-header.gold {
+      background: linear-gradient(45deg, #ffd700, #daa520);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .division-header.platinum {
+      background: linear-gradient(45deg, #e5e4e2, #c9c9c9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .division-icon {
+      font-size: 24px;
+    }
+
+    .division-stats {
+      margin-bottom: 12px;
+    }
+
+    .rating-display, .winrate-display {
+      font-size: 14px;
+      margin: 4px 0;
+      color: #ccc;
+    }
+
+    .rating-display span, .winrate-display span {
+      font-weight: bold;
+      color: #4deeea;
+    }
+
+    .division-info {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+    }
+
+    .season-info {
+      margin-top: 20px;
       padding: 12px;
-      background: rgba(30, 30, 46, 0.5);
-      border-radius: 8px;
+      background: rgba(30, 30, 46, 0.6);
+      border-radius: 12px;
+      border: 1px solid #4deeea;
+      text-align: center;
+    }
+
+    .season-timer {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .current-season {
+      font-size: 12px;
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+
+    /* Статистика */
+    .stats-box {
+      margin-top: 18px;
+      padding: 16px;
+      background: rgba(30, 30, 46, 0.6);
+      border-radius: 12px;
       text-align: left;
+      border: 1px solid #4deeea;
     }
     .stats-row {
       display: flex;
       justify-content: space-between;
-      margin: 6px 0;
+      margin: 8px 0;
+      padding: 4px 0;
     }
     .stats-label { color: #aaa; }
-    .stats-value { font-weight: bold; }
-    .winrate-good { color: #4deeea; }
-    .winrate-bad { color: #ff6b6b; }
+    .stats-value { font-weight: bold; font-size: 16px; }
+    .winrate-good { color: #4deeea; text-shadow: 0 0 10px rgba(77, 238, 234, 0.5); }
+    .winrate-bad { color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
 
-    /* 👤 Аватар */
+    /* Аватар */
     #user-avatar {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      background: #333;
-      margin: 0 auto;
+      background: linear-gradient(45deg, #4deeea, #ff6b6b);
+      margin: 0 auto 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
       color: white;
+      box-shadow: 0 0 20px rgba(77, 238, 234, 0.4);
+      border: 2px solid #4deeea;
     }
 
-    /* 🔙 Кнопка выхода */
+    /* Кнопка выхода */
     #logout-btn {
-      background: #555;
-      margin-top: 8px;
+      background: linear-gradient(45deg, #555, #777);
+      margin-top: 12px;
     }
 
-    /* ✅ Новые стили для кнопок */
+    /* Новые стили для кнопок */
     .auth-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      max-width: 340px;
+      gap: 18px;
+      max-width: 360px;
       margin: 30px auto 0;
     }
 
     .auth-btn {
       opacity: 0;
       transform: translateY(20px);
-      animation: fadeInUp 0.6s forwards;
+      animation: fadeInUp 0.7s forwards;
     }
     .auth-btn:nth-child(1) { animation-delay: 0.1s; }
     .auth-btn:nth-child(2) { animation-delay: 0.2s; }
@@ -449,18 +726,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      gap: 16px;
       width: 100%;
-      padding: 16px;
-      background: #4285F4;
+      padding: 18px;
+      background: linear-gradient(45deg, #4285F4, #357ae8);
       color: white;
       font-weight: bold;
       font-size: 16px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 10px rgba(66, 133, 244, 0.35);
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 15px rgba(66, 133, 244, 0.4);
       position: relative;
       overflow: hidden;
     }
@@ -469,14 +746,14 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.4s;
     }
     .google-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 14px rgba(66, 133, 244, 0.5);
-      background: #357ae8;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(66, 133, 244, 0.6);
+      background: linear-gradient(45deg, #357ae8, #2a69d4);
     }
     .google-btn:hover::before {
       opacity: 1;
@@ -485,26 +762,27 @@
 
     .guest-btn {
       width: 100%;
-      padding: 14px;
-      background: #2d2d3d;
+      padding: 16px;
+      background: linear-gradient(45deg, #2d2d3d, #3a3a4a);
       color: #ccc;
-      font-size: 15px;
+      font-size: 16px;
       border: 1px solid #404050;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s;
     }
     .guest-btn:hover {
-      background: #353545;
+      background: linear-gradient(45deg, #353545, #424252);
       color: #e0e0ff;
       border-color: #505060;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    /* 🌀 Иконка загрузки */
+    /* Иконка загрузки */
     .spinner {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-top: 2px solid white;
       border-radius: 50%;
@@ -521,18 +799,63 @@
     .google-btn.loading span {
       opacity: 0;
     }
+    
+    /* Анимация фона */
+    .background-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(77, 238, 234, 0.5);
+      animation: float 15s infinite linear;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Эффекты при наведении на ячейки */
+    .cell.player1:hover {
+      box-shadow: 0 0 20px rgba(30, 58, 138, 0.8);
+    }
+    
+    .cell.player2:hover {
+      box-shadow: 0 0 20px rgba(153, 27, 27, 0.8);
+    }
+    
+    /* Анимация для начала игры */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
   </style>
-
-  <!-- 🔊 Звуки (base64 заглушки) -->
-  <audio id="sound-click" preload="auto">
-    <source src="audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGlua3MuY29tU0VDAAAAAAABIjREUU1BQzRnQlNlZ2JlaF9nTl9nZ2JfZ2xnZ2lfQWxhbm5hX2xhZ19sYWdfQWxhbm5hX1NvdW5kX0JhbmtfY29tX0xpbmtzX2NvbQAAAA8AAANMYXZjNTcuODMuMTAw" type="audio/mpeg">
-  </audio>
-  <audio id="sound-toss" preload="auto">
-    <source src="audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGlua3MuY29tU0VDAAsMDAoKCQkICAYGBQUFBAQDAwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQIA//8AAAAEAAABAAAFqAD4AABpAAAAAAAWAAAA" type="audio/mpeg">
-  </audio>
-  <audio id="sound-result" preload="auto">
-    <source src="audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGlua3MuY29tU0VDAAACAwQFBgcICQoL" type="audio/mpeg">
-  </audio>
 </head>
 <body>
   <div class="demo-banner">
@@ -577,6 +900,67 @@
     <p>Кто начнёт первым?</p>
     <div class="dice" id="dice">?</div>
     <button onclick="startToss()">Подбросить кубик</button>
+    <button onclick="goToRatingScreen()" style="margin-top: 12px; background: linear-gradient(45deg, #4deeea, #ff6b6b);">Рейтинговый режим</button>
+  </div>
+
+  <!-- Рейтинговый экран -->
+  <div id="rating-screen" class="screen">
+    <h1>РЕЙТИНГОВЫЙ РЕЖИМ</h1>
+    <p>Выберите дивизион для игры с ботами</p>
+    
+    <div class="rating-divisions">
+      <div class="division-card" onclick="startRatingGame('silver')">
+        <div class="division-header silver">
+          <h2>СЕРЕБРО</h2>
+          <div class="division-icon">🥈</div>
+        </div>
+        <div class="division-stats">
+          <div class="rating-display">Рейтинг: <span id="silver-rating">1000</span></div>
+          <div class="winrate-display">Винрейт: <span id="silver-winrate">0%</span></div>
+        </div>
+        <div class="division-info">
+          <div>Уровень бота: Средний</div>
+          <div>Награда: +10 за победу</div>
+        </div>
+      </div>
+      
+      <div class="division-card" onclick="startRatingGame('gold')">
+        <div class="division-header gold">
+          <h2>ЗОЛОТО</h2>
+          <div class="division-icon">🥇</div>
+        </div>
+        <div class="division-stats">
+          <div class="rating-display">Рейтинг: <span id="gold-rating">1300</span></div>
+          <div class="winrate-display">Винрейт: <span id="gold-winrate">0%</span></div>
+        </div>
+        <div class="division-info">
+          <div>Уровень бота: Высокий</div>
+          <div>Награда: +15 за победу</div>
+        </div>
+      </div>
+      
+      <div class="division-card" onclick="startRatingGame('platinum')">
+        <div class="division-header platinum">
+          <h2>ПЛАТИНА</h2>
+          <div class="division-icon">💎</div>
+        </div>
+        <div class="division-stats">
+          <div class="rating-display">Рейтинг: <span id="platinum-rating">1600</span></div>
+          <div class="winrate-display">Винрейт: <span id="platinum-winrate">0%</span></div>
+        </div>
+        <div class="division-info">
+          <div>Уровень бота: Эксперт</div>
+          <div>Награда: +20 за победу</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="season-info">
+      <div class="season-timer">Сезон заканчивается через: <span id="season-timer">7 дней</span></div>
+      <div class="current-season">Сезон 1</div>
+    </div>
+    
+    <button onclick="goToStartScreen()" style="margin-top: 20px; background: linear-gradient(45deg, #555, #777);">Назад</button>
   </div>
 
   <div id="game-screen" class="screen">
@@ -811,6 +1195,37 @@
     const TOTAL_MOVES = 14;
     let board, reactors, moveCount, gameActive, currentPlayer, currentUser = null;
 
+    // Создание анимированных частиц фона
+    function createBackgroundParticles() {
+      const container = document.getElementById('background-animation');
+      container.innerHTML = '';
+      
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Случайные параметры для частицы
+        const size = Math.random() * 20 + 5;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100 + 100; // Начинаем за пределами экрана
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        const hue = Math.random() > 0.5 ? 180 : 0; // Голубой или красный
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        particle.style.background = `hsla(${hue}, 70%, 60%, 0.5)`;
+        particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
+        
+        container.appendChild(particle);
+      }
+    }
+
+    // Инициализация частиц при загрузке
+    window.addEventListener('load', createBackgroundParticles);
+
     // 🔊 Инициализация звука
     let audioInitialized = false;
     function initAudio() {
@@ -1030,7 +1445,12 @@
       } else {
         statusEl.textContent = 'Бот ходит первым...';
         render();
-        setTimeout(botMove, 800);
+        // Вызываем правильную версию botMove в зависимости от режима
+        if (ratingData.currentDivision) {
+          setTimeout(ratingBotMove, 800);
+        } else {
+          setTimeout(botMove, 800);
+        }
       }
       render();
     }
@@ -1120,7 +1540,13 @@
       if (moveCount < TOTAL_MOVES) {
         document.getElementById('status').textContent = 'Ход бота...';
         render();
-        setTimeout(botMove, 600);
+        
+        // Определяем, какую версию botMove вызывать в зависимости от режима
+        if (ratingData.currentDivision) {
+          setTimeout(ratingBotMove, 600);
+        } else {
+          setTimeout(botMove, 600);
+        }
       } else {
         render();
       }
@@ -1214,6 +1640,125 @@
       render();
     }
 
+    function ratingBotMove() {
+      if (!gameActive || currentPlayer !== 'bot') return;
+
+      // Определяем уровень сложности в зависимости от дивизиона
+      let difficultyFactor = 1.0; // по умолчанию
+      switch(ratingData.currentDivision) {
+        case 'silver':
+          difficultyFactor = 0.8; // более слабый бот
+          break;
+        case 'gold':
+          difficultyFactor = 1.0; // обычный бот
+          break;
+        case 'platinum':
+          difficultyFactor = 1.3; // более сильный бот
+          break;
+      }
+
+      const phase = moveCount < 5 ? 'early' : moveCount < 10 ? 'mid' : 'late';
+      let moves = [];
+      const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (board[r][c] !== 0) continue;
+
+          let baseValue = 0;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+              if (board[nr][nc] === 1) baseValue += 10;
+              else if (board[nr][nc] === 0) baseValue += 4;
+              else if (board[nr][nc] === 2) baseValue += 1;
+            }
+          }
+          if (phase === 'early' && r >= 2 && r <= 4 && c >= 2 && c <= 4) {
+            baseValue += 4;
+          }
+
+          let threatValue = 0;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc] === 1) {
+              let futureDamage = 0;
+              for (const [dr2, dc2] of dirs) {
+                const nnr = nr + dr2, nnc = nc + dc2;
+                if (nnr >= 0 && nnr < SIZE && nnc >= 0 && nnc < SIZE) {
+                  if (board[nnr][nnc] === 2) futureDamage++;
+                }
+              }
+              threatValue = Math.max(threatValue, futureDamage * 5);
+            }
+          }
+
+          let opponentResponseValue = 0;
+          const simBoard = board.map(row => [...row]);
+          simBoard[r][c] = 2;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+              simBoard[nr][nc] = 2;
+            }
+          }
+          let bestOpponentValue = 0;
+          for (let or = 0; or < SIZE; or++) {
+            for (let oc = 0; oc < SIZE; oc++) {
+              if (simBoard[or][oc] === 0) {
+                let val = 0;
+                for (const [dr, dc] of dirs) {
+                  const nnr = or + dr, nnc = oc + dc;
+                  if (nnr >= 0 && nnr < SIZE && nnc >= 0 && nnc < SIZE) {
+                    if (simBoard[nnr][nnc] === 2) val += 10;
+                    else if (simBoard[nnr][nnc] === 0) val += 4;
+                  }
+                }
+                bestOpponentValue = Math.max(bestOpponentValue, val);
+              }
+            }
+          }
+          opponentResponseValue = -bestOpponentValue * 0.7;
+
+          let totalValue = baseValue + threatValue + opponentResponseValue;
+          
+          // Применяем фактор сложности
+          totalValue = totalValue * difficultyFactor;
+          totalValue += (Math.random() - 0.5) * (2 / difficultyFactor); // корректируем рандом в зависимости от сложности
+
+          moves.push({ r, c, value: totalValue });
+        }
+      }
+
+      if (moves.length === 0) return;
+
+      moves.sort((a, b) => b.value - a.value);
+      
+      // В зависимости от сложности выбираем лучший ход или чуть худший
+      let chosen;
+      if (ratingData.currentDivision === 'platinum') {
+        // В платине бот почти всегда выбирает лучший ход
+        const topMoves = moves.slice(0, 1);
+        chosen = topMoves[0];
+      } else if (ratingData.currentDivision === 'gold') {
+        // В золоте бот выбирает из топ-2
+        const topMoves = moves.slice(0, 2);
+        chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+      } else {
+        // В серебре бот может выбрать чуть худший ход (из топ-3)
+        const topMoves = moves.slice(0, 3);
+        chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+      }
+
+      activateReactor(chosen.r, chosen.c, 2);
+      moveCount++;
+      currentPlayer = 'human';
+      if (moveCount < TOTAL_MOVES) {
+        document.getElementById('status').textContent = 'Твой ход — поставь реактор';
+      }
+      render();
+    }
+
     function resetToStart() {
       document.getElementById('game-screen').classList.remove('active');
       document.getElementById('start-screen').classList.add('active');
@@ -1238,6 +1783,239 @@
       const arrow = document.getElementById(`arrow-${sectionId}`);
       content.classList.toggle('open');
       arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    // Рейтинговая система
+    let ratingData = {
+      currentDivision: 'silver',
+      ratings: {
+        silver: 1000,
+        gold: 1300,
+        platinum: 1600
+      },
+      winrates: {
+        silver: 0,
+        gold: 0,
+        platinum: 0
+      },
+      games: {
+        silver: { wins: 0, total: 0 },
+        gold: { wins: 0, total: 0 },
+        platinum: { wins: 0, total: 0 }
+      },
+      seasonEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 дней от текущей даты
+    };
+
+    function goToRatingScreen() {
+      if (!currentUser) {
+        showNotification("Ошибка", "Сначала войдите или выберите гостя");
+        return;
+      }
+      document.getElementById('start-screen').classList.remove('active');
+      document.getElementById('rating-screen').classList.add('active');
+      updateRatingDisplay();
+    }
+
+    function updateRatingDisplay() {
+      // Обновляем отображение рейтинга для каждого дивизиона
+      document.getElementById('silver-rating').textContent = ratingData.ratings.silver;
+      document.getElementById('gold-rating').textContent = ratingData.ratings.gold;
+      document.getElementById('platinum-rating').textContent = ratingData.ratings.platinum;
+      
+      // Обновляем винрейты
+      const silverWinrate = ratingData.games.silver.total ? 
+        Math.round((ratingData.games.silver.wins / ratingData.games.silver.total) * 100) : 0;
+      const goldWinrate = ratingData.games.gold.total ? 
+        Math.round((ratingData.games.gold.wins / ratingData.games.gold.total) * 100) : 0;
+      const platinumWinrate = ratingData.games.platinum.total ? 
+        Math.round((ratingData.games.platinum.wins / ratingData.games.platinum.total) * 100) : 0;
+        
+      document.getElementById('silver-winrate').textContent = `${silverWinrate}%`;
+      document.getElementById('gold-winrate').textContent = `${goldWinrate}%`;
+      document.getElementById('platinum-winrate').textContent = `${platinumWinrate}%`;
+      
+      // Обновляем таймер сезона
+      updateSeasonTimer();
+    }
+
+    function updateSeasonTimer() {
+      const now = new Date();
+      const diff = ratingData.seasonEndDate - now;
+      
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById('season-timer').textContent = `${days} дн. ${hours} ч.`;
+      } else {
+        document.getElementById('season-timer').textContent = 'Сезон завершен!';
+      }
+    }
+
+    function startRatingGame(division) {
+      ratingData.currentDivision = division;
+      document.getElementById('rating-screen').classList.remove('active');
+      document.getElementById('game-screen').classList.add('active');
+      
+      // Инициализируем игру с ботом определенного уровня в зависимости от дивизиона
+      initRatingGame(division);
+    }
+
+    function initRatingGame(division) {
+      board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
+      reactors = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
+      moveCount = 0;
+      gameActive = true;
+      
+      // Определяем первого игрока (в рейтинговом режиме всегда начинает человек)
+      currentPlayer = 'human';
+
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = 'Твой ход — поставь реактор';
+      render();
+    }
+
+    function endRatingGame(result) {
+      gameActive = false;
+      const statusEl = document.getElementById('status');
+      let resultType = 'draw';
+      let ratingChange = 0;
+      
+      const youScore = document.getElementById('you-score').textContent;
+      const botScore = document.getElementById('bot-score').textContent;
+      
+      if (parseInt(youScore) > parseInt(botScore)) {
+        statusEl.textContent = '🏆 Победа!';
+        resultType = 'win';
+        
+        // Изменение рейтинга в зависимости от дивизиона
+        switch(ratingData.currentDivision) {
+          case 'silver':
+            ratingChange = 10;
+            break;
+          case 'gold':
+            ratingChange = 15;
+            break;
+          case 'platinum':
+            ratingChange = 20;
+            break;
+        }
+        
+        ratingData.ratings[ratingData.currentDivision] += ratingChange;
+        ratingData.games[ratingData.currentDivision].wins++;
+      } else if (parseInt(botScore) > parseInt(youScore)) {
+        statusEl.textContent = '💔 Поражение.';
+        resultType = 'loss';
+        
+        // Штраф в рейтинге при поражении
+        switch(ratingData.currentDivision) {
+          case 'silver':
+            ratingChange = -8;
+            break;
+          case 'gold':
+            ratingChange = -12;
+            break;
+          case 'platinum':
+            ratingChange = -15;
+            break;
+        }
+        
+        ratingData.ratings[ratingData.currentDivision] += ratingChange;
+      } else {
+        statusEl.textContent = '🤝 Ничья!';
+        resultType = 'draw';
+      }
+      
+      ratingData.games[ratingData.currentDivision].total++;
+      
+      // Проверяем повышение/понижение дивизиона
+      checkDivisionChange();
+      
+      playSound('result');
+      updateRatingDisplay();
+    }
+
+    function checkDivisionChange() {
+      const currentRating = ratingData.ratings[ratingData.currentDivision];
+      
+      // Проверяем переходы между дивизионами
+      if (ratingData.currentDivision === 'silver' && currentRating >= 1200) {
+        showNotification("Повышение!", "Вы переходите в дивизион ЗОЛОТО!");
+        ratingData.currentDivision = 'gold';
+      } else if (ratingData.currentDivision === 'gold' && currentRating >= 1500) {
+        showNotification("Повышение!", "Вы переходите в дивизион ПЛАТИНА!");
+        ratingData.currentDivision = 'platinum';
+      } else if (ratingData.currentDivision === 'gold' && currentRating < 1100) {
+        showNotification("Понижение", "Вы переходите в дивизион СЕРЕБРО!");
+        ratingData.currentDivision = 'silver';
+      } else if (ratingData.currentDivision === 'platinum' && currentRating < 1400) {
+        showNotification("Понижение", "Вы переходите в дивизион ЗОЛОТО!");
+        ratingData.currentDivision = 'gold';
+      }
+    }
+
+    // Обновленная функция initRatingGame
+    function initRatingGame(division) {
+      board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
+      reactors = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
+      moveCount = 0;
+      gameActive = true;
+      
+      // Определяем первого игрока (в рейтинговом режиме всегда начинает человек)
+      currentPlayer = 'human';
+
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = 'Твой ход — поставь реактор';
+      render();
+    }
+
+    // Модифицированная функция render для обработки завершения рейтинговой игры
+    function render() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      let youScore = 0, botScore = 0;
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          if (board[r][c] === 1) {
+            cell.classList.add('player1');
+            youScore++;
+          } else if (board[r][c] === 2) {
+            cell.classList.add('player2');
+            botScore++;
+          }
+          if (reactors[r][c]) cell.classList.add('reactor');
+
+          if (gameActive && board[r][c] === 0 && moveCount < TOTAL_MOVES && currentPlayer === 'human') {
+            cell.onclick = () => playerMove(r, c);
+          }
+          boardEl.appendChild(cell);
+        }
+      }
+
+      document.getElementById('you-score').textContent = youScore;
+      document.getElementById('bot-score').textContent = botScore;
+
+      if (moveCount >= TOTAL_MOVES && gameActive) {
+        // Проверяем, является ли это рейтинговой игрой
+        if (document.getElementById('rating-screen').classList.contains('active') || 
+            ratingData.currentDivision) {
+          endRatingGame(); // Вызываем специальную функцию для завершения рейтинговой игры
+        } else {
+          // Обычная игра - завершаем как обычно
+          gameActive = false;
+          const statusEl = document.getElementById('status');
+          if (youScore > botScore) {
+            statusEl.textContent = '🏆 Победа!';
+          } else if (botScore > youScore) {
+            statusEl.textContent = '💔 Поражение.';
+          } else {
+            statusEl.textContent = '🤝 Ничья!';
+          }
+          playSound('result');
+        }
+      }
     }
 
     // Обработчики кнопок
@@ -1281,6 +2059,9 @@
 
     // Подгрузить статистику
     renderStats();
+    
+    // Обновить отображение рейтинга
+    updateRatingDisplay();
 
     // 💡 Подсказка для Google OAuth (в консоли)
     console.log(
