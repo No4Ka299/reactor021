@@ -535,6 +535,125 @@
       fill: white;
     }
 
+    /* Рейтинговая система */
+    .rating-divisions {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 400px;
+      margin: 20px auto;
+      width: 100%;
+    }
+
+    .division-card {
+      background: linear-gradient(145deg, #1a1a2a, #252538);
+      border: 2px solid #4deeea;
+      border-radius: 15px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .division-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.3s ease;
+      z-index: -1;
+    }
+
+    .division-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(77, 238, 234, 0.4);
+    }
+
+    .division-card:hover::before {
+      transform: rotate(45deg) translate(10%, 10%);
+    }
+
+    .division-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .division-header.silver {
+      background: linear-gradient(45deg, #c0c0c0, #a0a0a0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .division-header.gold {
+      background: linear-gradient(45deg, #ffd700, #daa520);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .division-header.platinum {
+      background: linear-gradient(45deg, #e5e4e2, #c9c9c9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .division-icon {
+      font-size: 24px;
+    }
+
+    .division-stats {
+      margin-bottom: 12px;
+    }
+
+    .rating-display, .winrate-display {
+      font-size: 14px;
+      margin: 4px 0;
+      color: #ccc;
+    }
+
+    .rating-display span, .winrate-display span {
+      font-weight: bold;
+      color: #4deeea;
+    }
+
+    .division-info {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+    }
+
+    .season-info {
+      margin-top: 20px;
+      padding: 12px;
+      background: rgba(30, 30, 46, 0.6);
+      border-radius: 12px;
+      border: 1px solid #4deeea;
+      text-align: center;
+    }
+
+    .season-timer {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .current-season {
+      font-size: 12px;
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+
     /* Статистика */
     .stats-box {
       margin-top: 18px;
@@ -781,6 +900,67 @@
     <p>Кто начнёт первым?</p>
     <div class="dice" id="dice">?</div>
     <button onclick="startToss()">Подбросить кубик</button>
+    <button onclick="goToRatingScreen()" style="margin-top: 12px; background: linear-gradient(45deg, #4deeea, #ff6b6b);">Рейтинговый режим</button>
+  </div>
+
+  <!-- Рейтинговый экран -->
+  <div id="rating-screen" class="screen">
+    <h1>РЕЙТИНГОВЫЙ РЕЖИМ</h1>
+    <p>Выберите дивизион для игры с ботами</p>
+    
+    <div class="rating-divisions">
+      <div class="division-card" onclick="startRatingGame('silver')">
+        <div class="division-header silver">
+          <h2>СЕРЕБРО</h2>
+          <div class="division-icon">🥈</div>
+        </div>
+        <div class="division-stats">
+          <div class="rating-display">Рейтинг: <span id="silver-rating">1000</span></div>
+          <div class="winrate-display">Винрейт: <span id="silver-winrate">0%</span></div>
+        </div>
+        <div class="division-info">
+          <div>Уровень бота: Средний</div>
+          <div>Награда: +10 за победу</div>
+        </div>
+      </div>
+      
+      <div class="division-card" onclick="startRatingGame('gold')">
+        <div class="division-header gold">
+          <h2>ЗОЛОТО</h2>
+          <div class="division-icon">🥇</div>
+        </div>
+        <div class="division-stats">
+          <div class="rating-display">Рейтинг: <span id="gold-rating">1300</span></div>
+          <div class="winrate-display">Винрейт: <span id="gold-winrate">0%</span></div>
+        </div>
+        <div class="division-info">
+          <div>Уровень бота: Высокий</div>
+          <div>Награда: +15 за победу</div>
+        </div>
+      </div>
+      
+      <div class="division-card" onclick="startRatingGame('platinum')">
+        <div class="division-header platinum">
+          <h2>ПЛАТИНА</h2>
+          <div class="division-icon">💎</div>
+        </div>
+        <div class="division-stats">
+          <div class="rating-display">Рейтинг: <span id="platinum-rating">1600</span></div>
+          <div class="winrate-display">Винрейт: <span id="platinum-winrate">0%</span></div>
+        </div>
+        <div class="division-info">
+          <div>Уровень бота: Эксперт</div>
+          <div>Награда: +20 за победу</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="season-info">
+      <div class="season-timer">Сезон заканчивается через: <span id="season-timer">7 дней</span></div>
+      <div class="current-season">Сезон 1</div>
+    </div>
+    
+    <button onclick="goToStartScreen()" style="margin-top: 20px; background: linear-gradient(45deg, #555, #777);">Назад</button>
   </div>
 
   <div id="game-screen" class="screen">
@@ -1265,7 +1445,12 @@
       } else {
         statusEl.textContent = 'Бот ходит первым...';
         render();
-        setTimeout(botMove, 800);
+        // Вызываем правильную версию botMove в зависимости от режима
+        if (ratingData.currentDivision) {
+          setTimeout(ratingBotMove, 800);
+        } else {
+          setTimeout(botMove, 800);
+        }
       }
       render();
     }
@@ -1355,7 +1540,13 @@
       if (moveCount < TOTAL_MOVES) {
         document.getElementById('status').textContent = 'Ход бота...';
         render();
-        setTimeout(botMove, 600);
+        
+        // Определяем, какую версию botMove вызывать в зависимости от режима
+        if (ratingData.currentDivision) {
+          setTimeout(ratingBotMove, 600);
+        } else {
+          setTimeout(botMove, 600);
+        }
       } else {
         render();
       }
@@ -1449,6 +1640,125 @@
       render();
     }
 
+    function ratingBotMove() {
+      if (!gameActive || currentPlayer !== 'bot') return;
+
+      // Определяем уровень сложности в зависимости от дивизиона
+      let difficultyFactor = 1.0; // по умолчанию
+      switch(ratingData.currentDivision) {
+        case 'silver':
+          difficultyFactor = 0.8; // более слабый бот
+          break;
+        case 'gold':
+          difficultyFactor = 1.0; // обычный бот
+          break;
+        case 'platinum':
+          difficultyFactor = 1.3; // более сильный бот
+          break;
+      }
+
+      const phase = moveCount < 5 ? 'early' : moveCount < 10 ? 'mid' : 'late';
+      let moves = [];
+      const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (board[r][c] !== 0) continue;
+
+          let baseValue = 0;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+              if (board[nr][nc] === 1) baseValue += 10;
+              else if (board[nr][nc] === 0) baseValue += 4;
+              else if (board[nr][nc] === 2) baseValue += 1;
+            }
+          }
+          if (phase === 'early' && r >= 2 && r <= 4 && c >= 2 && c <= 4) {
+            baseValue += 4;
+          }
+
+          let threatValue = 0;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc] === 1) {
+              let futureDamage = 0;
+              for (const [dr2, dc2] of dirs) {
+                const nnr = nr + dr2, nnc = nc + dc2;
+                if (nnr >= 0 && nnr < SIZE && nnc >= 0 && nnc < SIZE) {
+                  if (board[nnr][nnc] === 2) futureDamage++;
+                }
+              }
+              threatValue = Math.max(threatValue, futureDamage * 5);
+            }
+          }
+
+          let opponentResponseValue = 0;
+          const simBoard = board.map(row => [...row]);
+          simBoard[r][c] = 2;
+          for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+              simBoard[nr][nc] = 2;
+            }
+          }
+          let bestOpponentValue = 0;
+          for (let or = 0; or < SIZE; or++) {
+            for (let oc = 0; oc < SIZE; oc++) {
+              if (simBoard[or][oc] === 0) {
+                let val = 0;
+                for (const [dr, dc] of dirs) {
+                  const nnr = or + dr, nnc = oc + dc;
+                  if (nnr >= 0 && nnr < SIZE && nnc >= 0 && nnc < SIZE) {
+                    if (simBoard[nnr][nnc] === 2) val += 10;
+                    else if (simBoard[nnr][nnc] === 0) val += 4;
+                  }
+                }
+                bestOpponentValue = Math.max(bestOpponentValue, val);
+              }
+            }
+          }
+          opponentResponseValue = -bestOpponentValue * 0.7;
+
+          let totalValue = baseValue + threatValue + opponentResponseValue;
+          
+          // Применяем фактор сложности
+          totalValue = totalValue * difficultyFactor;
+          totalValue += (Math.random() - 0.5) * (2 / difficultyFactor); // корректируем рандом в зависимости от сложности
+
+          moves.push({ r, c, value: totalValue });
+        }
+      }
+
+      if (moves.length === 0) return;
+
+      moves.sort((a, b) => b.value - a.value);
+      
+      // В зависимости от сложности выбираем лучший ход или чуть худший
+      let chosen;
+      if (ratingData.currentDivision === 'platinum') {
+        // В платине бот почти всегда выбирает лучший ход
+        const topMoves = moves.slice(0, 1);
+        chosen = topMoves[0];
+      } else if (ratingData.currentDivision === 'gold') {
+        // В золоте бот выбирает из топ-2
+        const topMoves = moves.slice(0, 2);
+        chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+      } else {
+        // В серебре бот может выбрать чуть худший ход (из топ-3)
+        const topMoves = moves.slice(0, 3);
+        chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+      }
+
+      activateReactor(chosen.r, chosen.c, 2);
+      moveCount++;
+      currentPlayer = 'human';
+      if (moveCount < TOTAL_MOVES) {
+        document.getElementById('status').textContent = 'Твой ход — поставь реактор';
+      }
+      render();
+    }
+
     function resetToStart() {
       document.getElementById('game-screen').classList.remove('active');
       document.getElementById('start-screen').classList.add('active');
@@ -1473,6 +1783,239 @@
       const arrow = document.getElementById(`arrow-${sectionId}`);
       content.classList.toggle('open');
       arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    // Рейтинговая система
+    let ratingData = {
+      currentDivision: 'silver',
+      ratings: {
+        silver: 1000,
+        gold: 1300,
+        platinum: 1600
+      },
+      winrates: {
+        silver: 0,
+        gold: 0,
+        platinum: 0
+      },
+      games: {
+        silver: { wins: 0, total: 0 },
+        gold: { wins: 0, total: 0 },
+        platinum: { wins: 0, total: 0 }
+      },
+      seasonEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 дней от текущей даты
+    };
+
+    function goToRatingScreen() {
+      if (!currentUser) {
+        showNotification("Ошибка", "Сначала войдите или выберите гостя");
+        return;
+      }
+      document.getElementById('start-screen').classList.remove('active');
+      document.getElementById('rating-screen').classList.add('active');
+      updateRatingDisplay();
+    }
+
+    function updateRatingDisplay() {
+      // Обновляем отображение рейтинга для каждого дивизиона
+      document.getElementById('silver-rating').textContent = ratingData.ratings.silver;
+      document.getElementById('gold-rating').textContent = ratingData.ratings.gold;
+      document.getElementById('platinum-rating').textContent = ratingData.ratings.platinum;
+      
+      // Обновляем винрейты
+      const silverWinrate = ratingData.games.silver.total ? 
+        Math.round((ratingData.games.silver.wins / ratingData.games.silver.total) * 100) : 0;
+      const goldWinrate = ratingData.games.gold.total ? 
+        Math.round((ratingData.games.gold.wins / ratingData.games.gold.total) * 100) : 0;
+      const platinumWinrate = ratingData.games.platinum.total ? 
+        Math.round((ratingData.games.platinum.wins / ratingData.games.platinum.total) * 100) : 0;
+        
+      document.getElementById('silver-winrate').textContent = `${silverWinrate}%`;
+      document.getElementById('gold-winrate').textContent = `${goldWinrate}%`;
+      document.getElementById('platinum-winrate').textContent = `${platinumWinrate}%`;
+      
+      // Обновляем таймер сезона
+      updateSeasonTimer();
+    }
+
+    function updateSeasonTimer() {
+      const now = new Date();
+      const diff = ratingData.seasonEndDate - now;
+      
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById('season-timer').textContent = `${days} дн. ${hours} ч.`;
+      } else {
+        document.getElementById('season-timer').textContent = 'Сезон завершен!';
+      }
+    }
+
+    function startRatingGame(division) {
+      ratingData.currentDivision = division;
+      document.getElementById('rating-screen').classList.remove('active');
+      document.getElementById('game-screen').classList.add('active');
+      
+      // Инициализируем игру с ботом определенного уровня в зависимости от дивизиона
+      initRatingGame(division);
+    }
+
+    function initRatingGame(division) {
+      board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
+      reactors = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
+      moveCount = 0;
+      gameActive = true;
+      
+      // Определяем первого игрока (в рейтинговом режиме всегда начинает человек)
+      currentPlayer = 'human';
+
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = 'Твой ход — поставь реактор';
+      render();
+    }
+
+    function endRatingGame(result) {
+      gameActive = false;
+      const statusEl = document.getElementById('status');
+      let resultType = 'draw';
+      let ratingChange = 0;
+      
+      const youScore = document.getElementById('you-score').textContent;
+      const botScore = document.getElementById('bot-score').textContent;
+      
+      if (parseInt(youScore) > parseInt(botScore)) {
+        statusEl.textContent = '🏆 Победа!';
+        resultType = 'win';
+        
+        // Изменение рейтинга в зависимости от дивизиона
+        switch(ratingData.currentDivision) {
+          case 'silver':
+            ratingChange = 10;
+            break;
+          case 'gold':
+            ratingChange = 15;
+            break;
+          case 'platinum':
+            ratingChange = 20;
+            break;
+        }
+        
+        ratingData.ratings[ratingData.currentDivision] += ratingChange;
+        ratingData.games[ratingData.currentDivision].wins++;
+      } else if (parseInt(botScore) > parseInt(youScore)) {
+        statusEl.textContent = '💔 Поражение.';
+        resultType = 'loss';
+        
+        // Штраф в рейтинге при поражении
+        switch(ratingData.currentDivision) {
+          case 'silver':
+            ratingChange = -8;
+            break;
+          case 'gold':
+            ratingChange = -12;
+            break;
+          case 'platinum':
+            ratingChange = -15;
+            break;
+        }
+        
+        ratingData.ratings[ratingData.currentDivision] += ratingChange;
+      } else {
+        statusEl.textContent = '🤝 Ничья!';
+        resultType = 'draw';
+      }
+      
+      ratingData.games[ratingData.currentDivision].total++;
+      
+      // Проверяем повышение/понижение дивизиона
+      checkDivisionChange();
+      
+      playSound('result');
+      updateRatingDisplay();
+    }
+
+    function checkDivisionChange() {
+      const currentRating = ratingData.ratings[ratingData.currentDivision];
+      
+      // Проверяем переходы между дивизионами
+      if (ratingData.currentDivision === 'silver' && currentRating >= 1200) {
+        showNotification("Повышение!", "Вы переходите в дивизион ЗОЛОТО!");
+        ratingData.currentDivision = 'gold';
+      } else if (ratingData.currentDivision === 'gold' && currentRating >= 1500) {
+        showNotification("Повышение!", "Вы переходите в дивизион ПЛАТИНА!");
+        ratingData.currentDivision = 'platinum';
+      } else if (ratingData.currentDivision === 'gold' && currentRating < 1100) {
+        showNotification("Понижение", "Вы переходите в дивизион СЕРЕБРО!");
+        ratingData.currentDivision = 'silver';
+      } else if (ratingData.currentDivision === 'platinum' && currentRating < 1400) {
+        showNotification("Понижение", "Вы переходите в дивизион ЗОЛОТО!");
+        ratingData.currentDivision = 'gold';
+      }
+    }
+
+    // Обновленная функция initRatingGame
+    function initRatingGame(division) {
+      board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
+      reactors = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
+      moveCount = 0;
+      gameActive = true;
+      
+      // Определяем первого игрока (в рейтинговом режиме всегда начинает человек)
+      currentPlayer = 'human';
+
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = 'Твой ход — поставь реактор';
+      render();
+    }
+
+    // Модифицированная функция render для обработки завершения рейтинговой игры
+    function render() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      let youScore = 0, botScore = 0;
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          if (board[r][c] === 1) {
+            cell.classList.add('player1');
+            youScore++;
+          } else if (board[r][c] === 2) {
+            cell.classList.add('player2');
+            botScore++;
+          }
+          if (reactors[r][c]) cell.classList.add('reactor');
+
+          if (gameActive && board[r][c] === 0 && moveCount < TOTAL_MOVES && currentPlayer === 'human') {
+            cell.onclick = () => playerMove(r, c);
+          }
+          boardEl.appendChild(cell);
+        }
+      }
+
+      document.getElementById('you-score').textContent = youScore;
+      document.getElementById('bot-score').textContent = botScore;
+
+      if (moveCount >= TOTAL_MOVES && gameActive) {
+        // Проверяем, является ли это рейтинговой игрой
+        if (document.getElementById('rating-screen').classList.contains('active') || 
+            ratingData.currentDivision) {
+          endRatingGame(); // Вызываем специальную функцию для завершения рейтинговой игры
+        } else {
+          // Обычная игра - завершаем как обычно
+          gameActive = false;
+          const statusEl = document.getElementById('status');
+          if (youScore > botScore) {
+            statusEl.textContent = '🏆 Победа!';
+          } else if (botScore > youScore) {
+            statusEl.textContent = '💔 Поражение.';
+          } else {
+            statusEl.textContent = '🤝 Ничья!';
+          }
+          playSound('result');
+        }
+      }
     }
 
     // Обработчики кнопок
@@ -1516,6 +2059,9 @@
 
     // Подгрузить статистику
     renderStats();
+    
+    // Обновить отображение рейтинга
+    updateRatingDisplay();
 
     // 💡 Подсказка для Google OAuth (в консоли)
     console.log(
