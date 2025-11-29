@@ -674,6 +674,40 @@
     .winrate-good { color: #4deeea; text-shadow: 0 0 10px rgba(77, 238, 234, 0.5); }
     .winrate-bad { color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
 
+    /* Настройки */
+    .settings-content {
+      margin-top: 20px;
+    }
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(30, 30, 46, 0.4);
+      border-radius: 10px;
+    }
+    .setting-item label {
+      color: #ccc;
+      font-size: 14px;
+      flex: 1;
+    }
+    .setting-item input[type="range"],
+    .setting-item select {
+      flex: 2;
+      margin-left: 15px;
+      padding: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #4deeea;
+      border-radius: 5px;
+      color: white;
+    }
+    .setting-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #4deeea;
+    }
+
     /* Аватар */
     #user-avatar {
       width: 70px;
@@ -1202,7 +1236,40 @@
         </svg>
       </button>
       <h2>Settings</h2>
-      <p>Soon</p>
+      <div class="settings-content">
+        <div class="setting-item">
+          <label for="sound-volume">Громкость звука</label>
+          <input type="range" id="sound-volume" min="0" max="100" value="50">
+        </div>
+        <div class="setting-item">
+          <label for="particles-enabled">Эффекты частиц</label>
+          <input type="checkbox" id="particles-enabled" checked>
+        </div>
+        <div class="setting-item">
+          <label for="animations-enabled">Анимации</label>
+          <input type="checkbox" id="animations-enabled" checked>
+        </div>
+        <div class="setting-item">
+          <label for="background-animation">Анимация фона</label>
+          <input type="checkbox" id="background-animation" checked>
+        </div>
+        <div class="setting-item">
+          <label for="game-speed">Скорость игры</label>
+          <select id="game-speed">
+            <option value="slow">Медленная</option>
+            <option value="normal" selected>Нормальная</option>
+            <option value="fast">Быстрая</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="board-size">Размер доски</label>
+          <select id="board-size">
+            <option value="5">5x5</option>
+            <option value="7" selected>7x7</option>
+            <option value="9">9x9</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2013,14 +2080,17 @@
       currentDivision: 'bronze',  // Начинаем с бронзы
       currentTier: 1,  // Уровень в дивизионе (1-3)
       rating: 1000,  // Общий рейтинг
+      placementMatches: 0,  // Количество сыгранных матчей для определения начального ранга
+      placementResults: [],  // Результаты первых 10 матчей
+      inPlacement: true,  // Находится ли игрок в матчах для определения начального ранга
       divisionRatings: {
-        bronze: { min: 0, max: 1199, name: 'Бронза' },
-        silver: { min: 1200, max: 1499, name: 'Серебро' },
-        gold: { min: 1500, max: 1799, name: 'Золото' },
-        platinum: { min: 1800, max: 2099, name: 'Платина' },
-        diamond: { min: 2100, max: 2499, name: 'Алмаз' },
-        champion: { min: 2500, max: 2999, name: 'Чемпион' },
-        grand_champion: { min: 3000, max: 9999, name: 'Гранд-Чемпион' }
+        bronze: { min: 0, max: 1199, name: 'Бронза', shortName: 'BRZ', minRating: 0 },
+        silver: { min: 1200, max: 1499, name: 'Серебро', shortName: 'SIL', minRating: 1200 },
+        gold: { min: 1500, max: 1799, name: 'Золото', shortName: 'GOL', minRating: 1500 },
+        platinum: { min: 1800, max: 2099, name: 'Платина', shortName: 'PLT', minRating: 1800 },
+        diamond: { min: 2100, max: 2499, name: 'Алмаз', shortName: 'DIM', minRating: 2100 },
+        champion: { min: 2500, max: 2999, name: 'Чемпион', shortName: 'CHP', minRating: 2500 },
+        grand_champion: { min: 3000, max: 9999, name: 'Гранд-Чемпион', shortName: 'GCH', minRating: 3000 }
       },
       // История игр для каждого дивизиона
       gameHistory: {
@@ -2062,6 +2132,65 @@
         ratingData.achievements.push('win_streak_3');
         ratingData.rating += getAchievementReward('win_streak_3');
         showNotification("Достижение!", "Серия из 3 побед! +75 рейтинга");
+      }
+    }
+    
+    // Функция для определения начального дивизиона после 10 матчей
+    function calculateStartingDivision() {
+      // Подсчет результатов: победа = 1 очко, ничья = 0.5 очка, поражение = 0 очков
+      let totalScore = 0;
+      for (const result of ratingData.placementResults) {
+        if (result === 'win') totalScore += 1;
+        else if (result === 'draw') totalScore += 0.5;
+        // поражение = 0 очков
+      }
+      
+      // Рассчитываем средний результат
+      const avgScore = totalScore / ratingData.placementResults.length;
+      
+      // Определяем начальный дивизион на основе среднего результата
+      if (avgScore >= 0.8) {
+        // Высокий процент побед - платина или выше
+        ratingData.currentDivision = 'platinum';
+        ratingData.rating = 1800; // Начальный рейтинг в платине
+      } else if (avgScore >= 0.65) {
+        // Хороший процент побед - золото
+        ratingData.currentDivision = 'gold';
+        ratingData.rating = 1500; // Начальный рейтинг в золоте
+      } else if (avgScore >= 0.5) {
+        // Средний процент побед - серебро
+        ratingData.currentDivision = 'silver';
+        ratingData.rating = 1200; // Начальный рейтинг в серебре
+      } else {
+        // Низкий процент побед - бронза
+        ratingData.currentDivision = 'bronze';
+        ratingData.rating = 1000; // Начальный рейтинг в бронзе
+      }
+      
+      // Дополнительно корректируем рейтинг в зависимости от точного результата
+      const ratingAdjustment = Math.round((avgScore - 0.5) * 1000);
+      ratingData.rating += ratingAdjustment;
+      
+      // Ограничиваем рейтинг в пределах дивизиона
+      const division = ratingData.divisionRatings[ratingData.currentDivision];
+      ratingData.rating = Math.max(division.minRating, Math.min(division.max, ratingData.rating));
+      
+      return ratingData.currentDivision;
+    }
+    
+    // Функция для проверки завершения матчей для определения начального ранга
+    function checkPlacementMatches() {
+      if (ratingData.inPlacement && ratingData.placementMatches >= 10) {
+        // Завершаем матчи для определения начального ранга
+        ratingData.inPlacement = false;
+        const startingDivision = calculateStartingDivision();
+        
+        // Показываем игроку его начальный дивизион
+        const divisionName = ratingData.divisionRatings[startingDivision].name;
+        showNotification("Матчи для определения ранга завершены!", `Ваш начальный дивизион: ${divisionName} с рейтингом ${ratingData.rating}`);
+        
+        // Обновляем отображение
+        updateRatingDisplay();
       }
     }
 
@@ -2159,6 +2288,61 @@
       let ratingChange = 0;
       let shouldCheckDivision = false;
       
+      // Если игрок еще в матчах для определения начального ранга
+
+      if (ratingData.inPlacement) {
+
+        // Увеличиваем счетчик матчей для определения ранга
+
+        ratingData.placementMatches++;
+
+        
+
+        // Сохраняем результат
+
+        if (youScore > botScore) {
+
+          resultType = 'win';
+
+          ratingData.placementResults.push('win');
+
+          statusEl.textContent = '🏆 Победа!';
+
+        } else if (botScore > youScore) {
+
+          resultType = 'loss';
+
+          ratingData.placementResults.push('loss');
+
+          statusEl.textContent = '💔 Поражение.';
+
+        } else {
+
+          resultType = 'draw';
+
+          ratingData.placementResults.push('draw');
+
+          statusEl.textContent = '🤝 Ничья!';
+
+        }
+
+        
+
+        // Проверяем, завершены ли матчи для определения начального ранга
+
+        checkPlacementMatches();
+
+        
+
+        // Обновляем отображение
+
+        playSound('result');
+
+        updateRatingDisplay();
+
+        return; // Выходим, т.к. в placement-матчах не изменяется рейтинг
+
+      }
       if (youScore > botScore) {
         statusEl.textContent = '🏆 Победа!';
         resultType = 'win';
