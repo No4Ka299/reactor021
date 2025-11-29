@@ -1116,6 +1116,27 @@
             <li>• Исправлен рейтинговый режим: добавлена квалификация для дивизионов</li>
             <li>• Исправлены стили: убран белый фон в настройках</li>
             <li>• Добавлена система сохранения настроек</li>
+            <li>• Исправлены профильные статы: победы и винрейт теперь обновляются в рейтинговых играх</li>
+            <li>• Исправлен рейтинговый режим: теперь кидается кубик для определения первого игрока</li>
+            <li>• Добавлено обновление таймера сезона каждую минуту с минутами</li>
+            <li>• Исправлены стили в профиле и настройках для лучшего отображения</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="patch-entry">
+        <div class="patch-header" onclick="togglePatch('patch-034')">
+          v0.3.4
+          <svg class="patch-arrow" id="arrow-034" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+        <div class="patch-content" id="patch-034">
+          <ul>
+            <li>• Исправлено: профильные статы теперь обновляются в рейтинговых играх</li>
+            <li>• Исправлено: в рейтинговом режиме теперь кидается кубик для определения первого игрока</li>
+            <li>• Исправлено: таймер сезона теперь обновляется каждую минуту с отображением минут</li>
+            <li>• Добавлено: обновлены настройки для лучшего отображения</li>
           </ul>
         </div>
       </div>
@@ -1998,10 +2019,19 @@
       if (diff > 0) {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        document.getElementById('season-timer').textContent = `${days} дн. ${hours} ч.`;
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('season-timer').textContent = `${days} дн. ${hours} ч. ${minutes} мин.`;
       } else {
         document.getElementById('season-timer').textContent = 'Сезон завершен!';
       }
+    }
+    
+    // Запускаем таймер обновления каждую минуту
+    function startSeasonTimer() {
+      // Обновляем таймер сразу
+      updateSeasonTimer();
+      // Затем обновляем каждую минуту
+      setInterval(updateSeasonTimer, 60000);
     }
 
     function startRatingGame(division) {
@@ -2050,18 +2080,42 @@
       }
     }
 
+    // Модифицированная функция initRatingGame
     function initRatingGame(division) {
       board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
       reactors = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
       moveCount = 0;
       gameActive = true;
       
-      // Определяем первого игрока (в рейтинговом режиме всегда начинает человек)
-      currentPlayer = 'human';
+      // В рейтинговом режиме кидаем кубик для определения первого игрока
+      playSound('toss');
+      const dice = document.getElementById('dice');
+      if (dice) {
+        dice.textContent = '?';
+        dice.className = 'dice animate';
+      }
 
-      const statusEl = document.getElementById('status');
-      statusEl.textContent = 'Твой ход — поставь реактор';
-      render();
+      setTimeout(() => {
+        const firstPlayer = Math.random() > 0.5 ? 'human' : 'bot';
+        if (dice) {
+          dice.textContent = firstPlayer === 'human' ? '👤' : '🤖';
+          dice.style.color = firstPlayer === 'human' ? '#4deeea' : '#ff6b6b';
+          dice.classList.remove('animate');
+        }
+
+        setTimeout(() => {
+          currentPlayer = firstPlayer;
+          const statusEl = document.getElementById('status');
+          if (currentPlayer === 'human') {
+            statusEl.textContent = 'Твой ход — поставь реактор';
+          } else {
+            statusEl.textContent = 'Бот ходит первым...';
+            // Бот делает первый ход
+            setTimeout(ratingBotMove, BOT_DELAY);
+          }
+          render();
+        }, 600);
+      }, 2200);
     }
 
     function endRatingGame(result) {
@@ -2119,6 +2173,9 @@
       
       // Проверяем повышение/понижение дивизиона
       checkDivisionChange();
+      
+      // Также обновляем общую статистику игрока
+      updateStats(resultType);
       
       playSound('result');
       updateRatingDisplay();
@@ -2328,6 +2385,9 @@
     
     // Обновить отображение рейтинга
     updateRatingDisplay();
+    
+    // Запустить таймер сезона
+    startSeasonTimer();
 
     // 💡 Подсказка для Google OAuth (в консоли)
     console.log(
